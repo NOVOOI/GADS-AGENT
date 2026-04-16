@@ -3,510 +3,1325 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Novooi — Google Ads Analyse</title>
+<title>Novooi — Google Ads</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --cream: #f5f0e8;
-    --warm-white: #faf7f2;
-    --sand: #e8dfc8;
-    --taupe: #c4b49a;
-    --brown: #8b7355;
-    --dark: #2c2416;
-    --ink: #3d3020;
-    --accent: #6b4f2a;
-    --red: #a0392a;
-    --green: #3a6b4f;
-    --border: #d4c8b0;
-  }
+:root{--cream:#f5f0e8;--warm:#faf7f2;--sand:#e8dfc8;--taupe:#c4b49a;--brown:#8b7355;--dark:#2c2416;--ink:#3d3020;--accent:#6b4f2a;--red:#a0392a;--green:#3a6b4f;--border:#d4c8b0;--orange:#c47820}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;min-height:100vh}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* Gate */
+#gate{position:fixed;inset:0;background:var(--dark);display:flex;align-items:center;justify-content:center;z-index:9999}
+#gate.hidden{display:none}
+.gate-box{text-align:center;width:320px}
+.gate-logo{font-size:28px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:var(--cream);margin-bottom:8px}
+.gate-sub{font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.15em;color:var(--taupe);text-transform:uppercase;margin-bottom:40px}
+.gate-box input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);padding:14px 18px;font-family:'Courier Prime',monospace;font-size:14px;color:var(--cream);text-align:center;letter-spacing:.1em;outline:none;margin-bottom:12px}
+.gate-box input::placeholder{color:var(--taupe)}
+.gate-btn{width:100%;padding:14px;background:var(--accent);color:var(--cream);font-family:'Courier Prime',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;border:none;cursor:pointer}
+.gate-btn:hover{background:var(--brown)}
+.gate-error{font-family:'Courier Prime',monospace;font-size:11px;color:#e07060;margin-top:10px;min-height:16px}
 
-  body {
-    background: var(--cream);
-    color: var(--ink);
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    min-height: 100vh;
-  }
+/* Onboarding */
+#onboarding{position:fixed;inset:0;background:rgba(44,36,22,.7);display:flex;align-items:center;justify-content:center;z-index:8888}
+#onboarding.hidden{display:none}
+.ob-box{background:var(--warm);border:1px solid var(--border);padding:40px;width:480px;max-width:92vw}
+.ob-step{display:none}.ob-step.active{display:block}
+.ob-num{font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.15em;color:var(--taupe);margin-bottom:12px}
+.ob-title{font-size:22px;font-weight:300;margin-bottom:12px;color:var(--dark)}
+.ob-text{font-size:15px;line-height:1.7;color:var(--ink);margin-bottom:24px}
+.ob-nav{display:flex;justify-content:space-between;align-items:center}
+.ob-dots{display:flex;gap:8px}
+.ob-dot{width:8px;height:8px;border-radius:50%;background:var(--sand);border:1px solid var(--border)}
+.ob-dot.active{background:var(--dark)}
+.ob-btn{padding:10px 24px;font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border:none}
+.ob-next{background:var(--dark);color:var(--cream)}
+.ob-skip{background:transparent;color:var(--taupe)}
 
-  /* Password gate */
-  #gate {
-    position: fixed; inset: 0;
-    background: var(--dark);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-  #gate.hidden { display: none; }
-  .gate-box { text-align: center; width: 320px; }
-  .gate-logo {
-    font-size: 28px; font-weight: 300;
-    letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--cream); margin-bottom: 8px;
-  }
-  .gate-sub {
-    font-family: 'Courier Prime', monospace; font-size: 10px;
-    letter-spacing: 0.15em; color: var(--taupe);
-    text-transform: uppercase; margin-bottom: 40px;
-  }
-  .gate-box input {
-    width: 100%; background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.15);
-    padding: 14px 18px; font-family: 'Courier Prime', monospace;
-    font-size: 14px; color: var(--cream); text-align: center;
-    letter-spacing: 0.1em; outline: none; margin-bottom: 12px;
-  }
-  .gate-box input::placeholder { color: var(--taupe); }
-  .gate-box input:focus { border-color: var(--taupe); }
-  .gate-btn {
-    width: 100%; padding: 14px; background: var(--accent);
-    color: var(--cream); font-family: 'Courier Prime', monospace;
-    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
-    border: none; cursor: pointer; transition: background 0.2s;
-  }
-  .gate-btn:hover { background: var(--brown); }
-  .gate-error {
-    font-family: 'Courier Prime', monospace; font-size: 11px;
-    color: #e07060; margin-top: 10px; min-height: 16px;
-  }
+/* Header */
+header{background:var(--dark);color:var(--cream);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--accent)}
+.header-left{display:flex;align-items:baseline;gap:14px}
+header h1{font-size:20px;font-weight:300;letter-spacing:.12em;text-transform:uppercase}
+header span{font-family:'Courier Prime',monospace;font-size:10px;color:var(--taupe);letter-spacing:.08em}
+.demo-pill{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.1em;padding:4px 10px;background:rgba(255,255,255,.1);color:var(--taupe);border:1px solid rgba(255,255,255,.15)}
 
-  header {
-    background: var(--dark); color: var(--cream);
-    padding: 20px 40px; display: flex; align-items: baseline;
-    gap: 16px; border-bottom: 2px solid var(--accent);
-  }
-  header h1 { font-size: 22px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; }
-  header span { font-family: 'Courier Prime', monospace; font-size: 11px; color: var(--taupe); letter-spacing: 0.08em; }
+/* Top bar */
+.top-bar{background:var(--sand);border-bottom:1px solid var(--border);padding:8px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.top-bar label{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--brown);white-space:nowrap}
+.top-bar input[type=text]{flex:1;min-width:200px;background:var(--warm);border:1px solid var(--border);padding:6px 10px;font-family:'Courier Prime',monospace;font-size:11px;color:var(--ink);outline:none}
+.top-bar input[type=text]:focus{border-color:var(--brown)}
+select.period-sel{background:var(--warm);border:1px solid var(--border);padding:6px 10px;font-family:'Courier Prime',monospace;font-size:11px;color:var(--ink);outline:none;cursor:pointer}
+.top-bar-status{font-family:'Courier Prime',monospace;font-size:10px;color:var(--taupe)}
 
-  .worker-bar {
-    background: var(--sand); border-bottom: 1px solid var(--border);
-    padding: 10px 40px; display: flex; align-items: center; gap: 12px;
-  }
-  .worker-bar label {
-    font-family: 'Courier Prime', monospace; font-size: 10px;
-    letter-spacing: 0.1em; text-transform: uppercase; color: var(--brown);
-    white-space: nowrap;
-  }
-  .worker-bar input {
-    flex: 1; background: var(--warm-white); border: 1px solid var(--border);
-    padding: 7px 12px; font-family: 'Courier Prime', monospace;
-    font-size: 12px; color: var(--ink); outline: none;
-  }
-  .worker-bar input:focus { border-color: var(--brown); }
-  #worker-status {
-    font-family: 'Courier Prime', monospace; font-size: 10px;
-    color: var(--taupe); white-space: nowrap;
-  }
+/* Nav */
+nav{background:var(--warm);border-bottom:1px solid var(--border);overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+.nav-btn{display:inline-block;padding:12px 18px;font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;color:var(--taupe);border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;transition:all .15s}
+.nav-btn:hover{color:var(--ink)}
+.nav-btn.active{color:var(--dark);border-bottom-color:var(--dark)}
 
-  .container { max-width: 1100px; margin: 0 auto; padding: 32px; }
+/* Container */
+.container{max-width:1200px;margin:0 auto;padding:24px}
+.section-page{display:none}
+.section-page.active{display:block}
 
-  .section {
-    background: var(--warm-white); border: 1px solid var(--border);
-    padding: 28px 32px; margin-bottom: 24px;
-  }
-  .section-title {
-    font-size: 11px; font-family: 'Courier Prime', monospace;
-    letter-spacing: 0.15em; text-transform: uppercase; color: var(--brown);
-    margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
-  }
+/* Cards */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{background:var(--warm);border:1px solid var(--border);padding:18px;text-align:center;position:relative}
+.stat-card.warn{border-color:var(--orange)}
+.stat-value{font-size:28px;font-weight:300;color:var(--dark);display:block;line-height:1;margin-bottom:4px}
+.stat-label{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--taupe)}
+.stat-bench{font-family:'Courier Prime',monospace;font-size:9px;margin-top:6px}
+.bench-good{color:var(--green)}.bench-bad{color:var(--red)}.bench-ok{color:var(--orange)}
 
-  .btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 12px 28px; font-family: 'Courier Prime', monospace;
-    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
-    cursor: pointer; border: none; transition: all 0.2s;
-  }
-  .btn-primary { background: var(--dark); color: var(--cream); }
-  .btn-primary:hover { background: var(--accent); }
-  .btn-primary:disabled { background: var(--taupe); cursor: not-allowed; }
-  .btn-ai {
-    background: var(--accent); color: var(--cream);
-    width: 100%; justify-content: center; padding: 16px; font-size: 12px;
-  }
-  .btn-ai:hover { background: var(--dark); }
-  .btn-ai:disabled { background: var(--taupe); cursor: not-allowed; }
+/* Section blocks */
+.block{background:var(--warm);border:1px solid var(--border);padding:24px;margin-bottom:20px}
+.block-title{font-size:11px;font-family:'Courier Prime',monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--brown);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:gap}
 
-  .status-bar {
-    font-family: 'Courier Prime', monospace; font-size: 11px;
-    padding: 10px 14px; background: var(--sand);
-    border-left: 3px solid var(--brown);
-    margin-top: 16px; display: none;
-  }
-  .status-bar.visible { display: block; }
-  .status-bar.error { border-left-color: var(--red); background: #fdf0ee; }
-  .status-bar.success { border-left-color: var(--green); background: #f0fdf4; }
+/* Tables */
+.table-controls{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.table-search{background:var(--cream);border:1px solid var(--border);padding:7px 12px;font-family:'Courier Prime',monospace;font-size:11px;color:var(--ink);outline:none;width:220px}
+.table-search:focus{border-color:var(--brown)}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:500px}
+thead tr{background:var(--dark);color:var(--cream)}
+th{padding:9px 12px;text-align:left;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;cursor:pointer;white-space:nowrap;user-select:none}
+th:hover{background:#3d3020}
+th .sort-icon{margin-left:4px;opacity:.5}
+th.sort-asc .sort-icon::after{content:'↑'}
+th.sort-desc .sort-icon::after{content:'↓'}
+th:not(.sort-asc):not(.sort-desc) .sort-icon::after{content:'↕'}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:hover{background:var(--sand)}
+td{padding:9px 12px}
+.mono{font-family:'Courier Prime',monospace;font-size:12px}
+.zone-green{color:var(--green);font-weight:600}
+.zone-red{color:var(--red);font-weight:600}
+.zone-orange{color:var(--orange);font-weight:600}
+.cell-green{background:#f0fdf4}
+.cell-red{background:#fdf0ee}
+.cell-orange{background:#fdf5e8}
 
-  .spinner {
-    display: inline-block; width: 12px; height: 12px;
-    border: 2px solid var(--taupe); border-top-color: var(--brown);
-    border-radius: 50%; animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
+/* Badges */
+.badge{display:inline-block;padding:2px 7px;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+.b-green{background:#e8f5ee;color:var(--green);border:1px solid #b8dfc8}
+.b-red{background:#fdf0ee;color:var(--red);border:1px solid #f0c8c0}
+.b-gray{background:var(--sand);color:var(--brown);border:1px solid var(--border)}
+.b-orange{background:#fdf5e8;color:var(--orange);border:1px solid #e8c88a}
 
-  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-  .stat-card {
-    background: var(--warm-white); border: 1px solid var(--border);
-    padding: 20px; text-align: center;
-  }
-  .stat-value { font-size: 32px; font-weight: 300; color: var(--dark); display: block; line-height: 1; margin-bottom: 6px; }
-  .stat-label { font-family: 'Courier Prime', monospace; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--taupe); }
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 22px;font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border:none;transition:all .15s}
+.btn-dark{background:var(--dark);color:var(--cream)}.btn-dark:hover{background:var(--accent)}
+.btn-outline{background:transparent;color:var(--ink);border:1px solid var(--border)}.btn-outline:hover{border-color:var(--brown)}
+.btn-accent{background:var(--accent);color:var(--cream)}.btn-accent:hover{background:var(--dark)}
+.btn-sm{padding:6px 14px;font-size:9px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  thead tr { background: var(--dark); color: var(--cream); }
-  thead th { padding: 10px 14px; text-align: left; font-family: 'Courier Prime', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 400; }
-  tbody tr { border-bottom: 1px solid var(--border); }
-  tbody tr:hover { background: var(--sand); }
-  tbody td { padding: 10px 14px; }
-  .mono { font-family: 'Courier Prime', monospace; font-size: 12px; }
+/* Status bar */
+.status{font-family:'Courier Prime',monospace;font-size:11px;padding:9px 12px;border-left:3px solid var(--brown);background:var(--sand);margin-top:12px;display:none}
+.status.on{display:block}
+.status.err{border-left-color:var(--red);background:#fdf0ee}
+.status.ok{border-left-color:var(--green);background:#f0fdf4}
 
-  .badge { display: inline-block; padding: 2px 8px; font-family: 'Courier Prime', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; }
-  .badge-green { background: #e8f5ee; color: var(--green); border: 1px solid #b8dfc8; }
-  .badge-gray { background: var(--sand); color: var(--brown); border: 1px solid var(--border); }
+/* Sparkline */
+.sparkline{display:inline-block;vertical-align:middle}
 
-  #ai-output { background: var(--warm-white); border: 1px solid var(--border); padding: 28px 32px; margin-top: 24px; display: none; }
-  #ai-output.visible { display: block; }
-  .ai-content { font-size: 17px; line-height: 1.7; font-weight: 300; }
-  .ai-content h3 { font-size: 13px; font-family: 'Courier Prime', monospace; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brown); margin: 24px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
-  .ai-content p { margin-bottom: 14px; }
-  .ai-content ul { padding-left: 20px; margin-bottom: 14px; }
-  .ai-content li { margin-bottom: 6px; }
-  .ai-content strong { font-weight: 600; color: var(--dark); }
+/* QS bar */
+.qs-wrap{display:flex;align-items:center;gap:6px}
+.qs-track{width:50px;height:5px;background:var(--sand);border-radius:3px;overflow:hidden}
+.qs-fill{height:100%;border-radius:3px}
 
-  #data-section { display: none; }
-  #data-section.visible { display: block; }
+/* Budget */
+.budget-bar-wrap{margin:12px 0}
+.budget-track{width:100%;height:10px;background:var(--sand);border-radius:5px;overflow:hidden;margin-top:6px}
+.budget-fill{height:100%;border-radius:5px;transition:width .5s}
 
-  .tab-nav { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
-  .tab-btn { padding: 10px 20px; font-family: 'Courier Prime', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; background: none; border: none; border-bottom: 2px solid transparent; color: var(--taupe); transition: all 0.2s; margin-bottom: -1px; }
-  .tab-btn.active { color: var(--dark); border-bottom-color: var(--dark); }
-  .tab-pane { display: none; }
-  .tab-pane.active { display: block; }
+/* Period compare */
+.compare-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.compare-card{background:var(--cream);border:1px solid var(--border);padding:16px}
+.compare-metric{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--taupe);margin-bottom:8px}
+.compare-vals{display:flex;align-items:baseline;gap:12px}
+.compare-cur{font-size:24px;font-weight:300;color:var(--dark)}
+.compare-delta{font-family:'Courier Prime',monospace;font-size:11px}
+
+/* AI Chat */
+.chat-wrap{border:1px solid var(--border);background:var(--cream)}
+.chat-messages{padding:16px;min-height:200px;max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.chat-msg{max-width:85%;padding:10px 14px;font-size:15px;line-height:1.6}
+.chat-msg.user{background:var(--dark);color:var(--cream);align-self:flex-end}
+.chat-msg.ai{background:var(--warm);border:1px solid var(--border);align-self:flex-start}
+.chat-input-row{display:flex;border-top:1px solid var(--border)}
+.chat-input{flex:1;padding:12px 16px;font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;border:none;background:var(--warm);color:var(--ink);outline:none}
+.chat-send{padding:12px 20px;font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:var(--dark);color:var(--cream);border:none;cursor:pointer}
+.chat-send:hover{background:var(--accent)}
+
+/* Log */
+.log-entry{font-family:'Courier Prime',monospace;font-size:11px;padding:8px 0;border-bottom:1px solid var(--border);display:flex;gap:16px;color:var(--ink)}
+.log-time{color:var(--taupe);white-space:nowrap}
+.log-empty{color:var(--taupe);font-family:'Courier Prime',monospace;font-size:11px;padding:20px 0}
+
+/* Spinner */
+.spinner{display:inline-block;width:11px;height:11px;border:2px solid var(--taupe);border-top-color:var(--brown);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Analysis results */
+.analysis-section{margin-bottom:28px}
+.analysis-section:last-child{margin-bottom:0}
+.analysis-label{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;padding:5px 10px;display:inline-block;margin-bottom:16px}
+.analysis-label.improve{background:#fdf5e8;color:var(--orange);border:1px solid #e8c88a}
+.analysis-label.strategic{background:#e8f5ee;color:var(--green);border:1px solid #b8dfc8}
+.analysis-item{border-left:3px solid var(--border);padding:14px 18px;margin-bottom:10px;background:var(--cream)}
+.analysis-item.improve{border-left-color:var(--orange)}
+.analysis-item.strategic{border-left-color:var(--green)}
+.analysis-item.critical{border-left-color:var(--red);background:#fdf9f8}
+.analysis-item-title{font-size:15px;font-weight:600;color:var(--dark);margin-bottom:6px}
+.analysis-item-body{font-size:15px;line-height:1.7;font-weight:300;color:var(--ink)}
+.analysis-item-body strong{font-weight:600;color:var(--dark)}
+.analysis-item-tag{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;color:var(--taupe)}
+
+/* Responsive */
+@media(max-width:640px){
+  header{padding:12px 16px}
+  .container{padding:16px}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .block{padding:16px}
+  .table-search{width:100%}
+  .btn-row{gap:8px}
+  .ob-box{padding:24px}
+}
 </style>
 </head>
 <body>
 
-<!-- Password gate -->
+<!-- Gate -->
 <div id="gate">
   <div class="gate-box">
     <div class="gate-logo">Novooi</div>
-    <div class="gate-sub">Google Ads Analyse</div>
-    <input type="password" id="gate-input" placeholder="Passord" onkeydown="if(event.key==='Enter') checkGate()">
+    <div class="gate-sub">Google Ads</div>
+    <input type="password" id="gate-pw" placeholder="Passord" onkeydown="if(event.key==='Enter')checkGate()">
     <button class="gate-btn" onclick="checkGate()">Logg inn</button>
-    <div class="gate-error" id="gate-error"></div>
+    <div class="gate-error" id="gate-err"></div>
+  </div>
+</div>
+
+<!-- Onboarding -->
+<div id="onboarding" class="hidden">
+  <div class="ob-box">
+    <div class="ob-step active" id="ob0">
+      <div class="ob-num">Steg 1 av 3</div>
+      <div class="ob-title">Velkommen til Google Ads-verktøyet</div>
+      <div class="ob-text">Dette verktøyet henter kampanjedata fra Google Ads og gir AI-drevne salgsanbefalinger for Novooi. Du kan bruke demo-data nå, eller koble til live data med Worker URL.</div>
+    </div>
+    <div class="ob-step" id="ob1">
+      <div class="ob-num">Steg 2 av 3</div>
+      <div class="ob-title">Lim inn Worker URL</div>
+      <div class="ob-text">Øverst på siden finner du et felt for Worker URL. Lim inn din Cloudflare Worker-adresse her for å hente ekte Google Ads-data. Alle API-nøkler er lagret sikkert i Worker-en.</div>
+    </div>
+    <div class="ob-step" id="ob2">
+      <div class="ob-num">Steg 3 av 3</div>
+      <div class="ob-title">AI-verktøy</div>
+      <div class="ob-text">Under AI-verktøy finner du AI-chat om kampanjedata, søkeordforslag, og annonsekopi-generator. Disse krever at Worker URL er satt og at Basic Access er godkjent.</div>
+    </div>
+    <div class="ob-nav">
+      <div class="ob-dots">
+        <div class="ob-dot active" id="odd0"></div>
+        <div class="ob-dot" id="odd1"></div>
+        <div class="ob-dot" id="odd2"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="ob-btn ob-skip" onclick="closeOnboarding()">Hopp over</button>
+        <button class="ob-btn ob-next" id="ob-next-btn" onclick="obNext()">Neste</button>
+      </div>
+    </div>
   </div>
 </div>
 
 <header>
-  <h1>Novooi</h1>
-  <span>Google Ads Analyse</span>
+  <div class="header-left">
+    <h1>Novooi</h1>
+    <span>Google Ads Analyse</span>
+  </div>
+  <div id="demo-pill" class="demo-pill">DEMO</div>
 </header>
 
-<!-- Worker URL bar -->
-<div class="worker-bar">
+<div class="top-bar">
   <label>Worker URL</label>
-  <input type="text" id="worker-url" placeholder="https://novooi-ads.din-subdomain.workers.dev" oninput="saveWorkerUrl()">
-  <span id="worker-status">ikke satt</span>
+  <input type="text" id="worker-url" placeholder="https://novooi-ads.marcus-3aa.workers.dev" oninput="onWorkerInput()">
+  <select class="period-sel" id="period-sel" onchange="onPeriodChange()">
+    <option value="LAST_7_DAYS">Siste 7 dager</option>
+    <option value="LAST_14_DAYS">Siste 14 dager</option>
+    <option value="LAST_30_DAYS" selected>Siste 30 dager</option>
+    <option value="LAST_90_DAYS">Siste 90 dager</option>
+  </select>
+  <div class="btn-row">
+    <button class="btn btn-dark btn-sm" onclick="loadDemo()">Demo-data</button>
+    <button class="btn btn-outline btn-sm" onclick="fetchAll()">Hent live data</button>
+  </div>
+  <span class="top-bar-status" id="top-status">— demo-modus</span>
 </div>
+
+<nav>
+  <button class="nav-btn active" onclick="showPage('oversikt',this)">Oversikt</button>
+  <button class="nav-btn" onclick="showPage('kampanjer',this)">Kampanjer</button>
+  <button class="nav-btn" onclick="showPage('sokeord',this)">Søkeord</button>
+  <button class="nav-btn" onclick="showPage('annonser',this)">Annonser</button>
+  <button class="nav-btn" onclick="showPage('negativeord',this)">Negative ord</button>
+  <button class="nav-btn" onclick="showPage('sammenlign',this)">Sammenlign</button>
+  <button class="nav-btn" onclick="showPage('ai',this)">AI-verktøy</button>
+  <button class="nav-btn" onclick="showPage('logg',this)">Logg</button>
+</nav>
 
 <div class="container">
 
-  <div class="section">
-    <div class="section-title">Datahenting</div>
-    <p style="font-size:15px;margin-bottom:20px;color:var(--brown)">Alle API-nøkler er lagret sikkert i Cloudflare Worker. Lim inn Worker URL-en over og klikk for å hente data.</p>
-    <div style="display:flex;gap:12px;align-items:center">
-      <button class="btn btn-primary" onclick="fetchAllData()">
-        <span>Hent kampanjedata</span>
-      </button>
-    </div>
-    <div id="status" class="status-bar"></div>
-  </div>
-
-  <!-- Data section -->
-  <div id="data-section">
-    <div class="stats-grid" id="stats-grid"></div>
-
-    <div class="section">
-      <div class="tab-nav">
-        <button class="tab-btn active" onclick="showTab('campaigns',event)">Kampanjer</button>
-        <button class="tab-btn" onclick="showTab('adgroups',event)">Annonsegrupper</button>
-        <button class="tab-btn" onclick="showTab('ads',event)">Annonser</button>
-        <button class="tab-btn" onclick="showTab('keywords',event)">Søkeord</button>
+  <!-- OVERSIKT -->
+  <div class="section-page active" id="page-oversikt">
+    <div id="stats-grid" class="stats-grid"></div>
+    <div class="block" id="budget-block">
+      <div class="block-title">Budsjett
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="font-family:'Courier Prime',monospace;font-size:10px;color:var(--taupe)">Månedlig budsjett (kr):</span>
+          <input type="number" id="budget-input" value="40000" style="width:90px;padding:4px 8px;font-family:'Courier Prime',monospace;font-size:11px;border:1px solid var(--border);background:var(--cream);color:var(--ink);outline:none" oninput="renderBudget()">
+        </div>
       </div>
-      <div id="tab-campaigns" class="tab-pane active"></div>
-      <div id="tab-adgroups" class="tab-pane"></div>
-      <div id="tab-ads" class="tab-pane"></div>
-      <div id="tab-keywords" class="tab-pane"></div>
+      <div id="budget-content"></div>
     </div>
-
-    <div class="section">
-      <div class="section-title">AI-analyse — Salgsoptimalisering</div>
-      <button class="btn btn-ai" id="analyse-btn" onclick="runAiAnalysis()">
-        Analyser kampanjer og gi salgsanbefalinger
-      </button>
-      <div id="ai-status" class="status-bar"></div>
+    <div class="block">
+      <div class="block-title">Topp kampanjer — ytelse</div>
+      <div class="table-wrap"><div id="top-campaigns-table"></div></div>
     </div>
   </div>
 
-  <div id="ai-output">
-    <div class="section-title">Analyse fra Claude</div>
-    <div class="ai-content" id="ai-content"></div>
+  <!-- KAMPANJER -->
+  <div class="section-page" id="page-kampanjer">
+    <div class="block">
+      <div class="block-title">Alle kampanjer
+        <button class="btn btn-outline btn-sm" onclick="exportCSV('campaigns')">Eksporter CSV</button>
+      </div>
+      <div class="table-controls">
+        <input type="text" class="table-search" placeholder="Søk i kampanjer..." oninput="filterTable('campaigns-tbl',this.value)">
+      </div>
+      <div class="table-wrap"><table id="campaigns-tbl"></table></div>
+    </div>
+    <div class="block" id="camp-analysis-block">
+      <div class="block-title">Claude-analyse — Kampanjer
+        <button class="btn btn-accent btn-sm" id="camp-analyse-btn" onclick="runTabAnalysis('campaigns')">Analyser kampanjer</button>
+      </div>
+      <div id="camp-analysis-status" class="status"></div>
+      <div id="camp-analysis-result"></div>
+    </div>
   </div>
 
-</div>
+  <!-- SØKEORD -->
+  <div class="section-page" id="page-sokeord">
+    <div class="block">
+      <div class="block-title">Søkeord
+        <button class="btn btn-outline btn-sm" onclick="exportCSV('keywords')">Eksporter CSV</button>
+      </div>
+      <div class="table-controls">
+        <input type="text" class="table-search" placeholder="Søk i søkeord..." oninput="filterTable('keywords-tbl',this.value)">
+        <select style="padding:6px 10px;font-family:'Courier Prime',monospace;font-size:11px;border:1px solid var(--border);background:var(--cream);outline:none" onchange="filterTable('keywords-tbl','',this.value,'matchType')">
+          <option value="">Alle match</option>
+          <option value="EXACT">Eksakt</option>
+          <option value="PHRASE">Frase</option>
+          <option value="BROAD">Bred</option>
+        </select>
+      </div>
+      <div class="table-wrap"><table id="keywords-tbl"></table></div>
+    </div>
+    <div class="block" id="qs-guide-block">
+      <div class="block-title">QS-forbedringsguide</div>
+      <div id="qs-guide-content"></div>
+    </div>
+    <div class="block" id="kw-analysis-block">
+      <div class="block-title">Claude-analyse — Søkeord
+        <button class="btn btn-accent btn-sm" id="kw-analyse-btn" onclick="runTabAnalysis('keywords')">Analyser søkeord</button>
+      </div>
+      <div id="kw-analysis-status" class="status"></div>
+      <div id="kw-analysis-result"></div>
+    </div>
+  </div>
+
+  <!-- ANNONSER -->
+  <div class="section-page" id="page-annonser">
+    <div class="block">
+      <div class="block-title">Annonsegrupper
+        <button class="btn btn-outline btn-sm" onclick="exportCSV('adgroups')">Eksporter CSV</button>
+      </div>
+      <div class="table-controls">
+        <input type="text" class="table-search" placeholder="Søk i annonsegrupper..." oninput="filterTable('adgroups-tbl',this.value)">
+      </div>
+      <div class="table-wrap"><table id="adgroups-tbl"></table></div>
+    </div>
+    <div class="block">
+      <div class="block-title">Annonser
+        <button class="btn btn-outline btn-sm" onclick="exportCSV('ads')">Eksporter CSV</button>
+      </div>
+      <div class="table-controls">
+        <input type="text" class="table-search" placeholder="Søk i annonser..." oninput="filterTable('ads-tbl',this.value)">
+      </div>
+      <div class="table-wrap"><table id="ads-tbl"></table></div>
+    </div>
+    <div class="block" id="ads-analysis-block">
+      <div class="block-title">Claude-analyse — Annonser
+        <button class="btn btn-accent btn-sm" id="ads-analyse-btn" onclick="runTabAnalysis('ads')">Analyser annonser</button>
+      </div>
+      <div id="ads-analysis-status" class="status"></div>
+      <div id="ads-analysis-result"></div>
+    </div>
+  </div>
+
+  <!-- NEGATIVE ORD -->
+  <div class="section-page" id="page-negativeord">
+    <div class="block">
+      <div class="block-title">Negative søkeord — anbefalte</div>
+      <p style="font-size:15px;margin-bottom:16px;color:var(--brown)">Søkeord med lav CTR og/eller lav konvertering som signaliserer feil målgruppe for Novooi.</p>
+      <div id="neg-kw-content"></div>
+    </div>
+    <div class="block">
+      <div class="block-title">Legg til negativt søkeord
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <input type="text" id="neg-input" placeholder="Nytt negativt søkeord..." style="flex:1;min-width:180px;padding:8px 12px;font-family:'Courier Prime',monospace;font-size:12px;border:1px solid var(--border);background:var(--cream);color:var(--ink);outline:none">
+        <select id="neg-match" style="padding:8px 10px;font-family:'Courier Prime',monospace;font-size:11px;border:1px solid var(--border);background:var(--cream);outline:none">
+          <option>EXACT</option><option>PHRASE</option><option>BROAD</option>
+        </select>
+        <button class="btn btn-dark btn-sm" onclick="addNegKw()">Legg til</button>
+      </div>
+      <div id="neg-added-list" style="margin-top:14px"></div>
+    </div>
+  </div>
+
+  <!-- SAMMENLIGN -->
+  <div class="section-page" id="page-sammenlign">
+    <div class="block">
+      <div class="block-title">Sammenlign perioder</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:20px">
+        <div>
+          <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--taupe);margin-bottom:4px">Periode A</div>
+          <select id="cmp-a" style="padding:7px 10px;font-family:'Courier Prime',monospace;font-size:11px;border:1px solid var(--border);background:var(--cream);outline:none">
+            <option value="LAST_30_DAYS">Siste 30 dager</option>
+            <option value="LAST_14_DAYS">Siste 14 dager</option>
+            <option value="LAST_7_DAYS">Siste 7 dager</option>
+          </select>
+        </div>
+        <div style="font-size:20px;color:var(--taupe);padding-top:16px">vs</div>
+        <div>
+          <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--taupe);margin-bottom:4px">Periode B</div>
+          <select id="cmp-b" style="padding:7px 10px;font-family:'Courier Prime',monospace;font-size:11px;border:1px solid var(--border);background:var(--cream);outline:none">
+            <option value="LAST_90_DAYS">Siste 90 dager</option>
+            <option value="LAST_30_DAYS">Siste 30 dager</option>
+            <option value="LAST_14_DAYS">Siste 14 dager</option>
+          </select>
+        </div>
+        <button class="btn btn-dark btn-sm" style="margin-top:16px" onclick="runComparison()">Sammenlign</button>
+      </div>
+      <div id="compare-content"></div>
+    </div>
+  </div>
+
+  <!-- AI VERKTØY -->
+  <div class="section-page" id="page-ai">
+    <div class="block">
+      <div class="block-title">AI-chat om kampanjedata</div>
+      <div class="chat-wrap">
+        <div class="chat-messages" id="chat-messages">
+          <div class="chat-msg ai">Hei! Jeg har tilgang til kampanjedataene dine. Spør meg om hva som helst — CTR, konverteringer, søkeordstrategi, budsjett, eller anbefalinger for å øke møbelsalget.</div>
+        </div>
+        <div class="chat-input-row">
+          <input type="text" class="chat-input" id="chat-input" placeholder="Still et spørsmål om kampanjene dine..." onkeydown="if(event.key==='Enter')sendChat()">
+          <button class="chat-send" onclick="sendChat()">Send</button>
+        </div>
+      </div>
+      <div id="chat-status" class="status"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px">
+      <div class="block">
+        <div class="block-title">Søkeordforslag</div>
+        <p style="font-size:15px;margin-bottom:16px;color:var(--brown)">Claude analyserer eksisterende søkeord og foreslår nye basert på kategorier og Novoois produktsortiment.</p>
+        <button class="btn btn-accent" id="kw-suggest-btn" onclick="suggestKeywords()">Generer søkeordforslag</button>
+        <div id="kw-suggest-status" class="status"></div>
+        <div id="kw-suggest-result" style="margin-top:16px"></div>
+      </div>
+      <div class="block">
+        <div class="block-title">Annonsekopi-generator</div>
+        <p style="font-size:15px;margin-bottom:16px;color:var(--brown)">Generer nye RSA-varianter (headlines + descriptions) basert på toppytende annonser og produktkategorier.</p>
+        <select id="adcopy-cat" style="width:100%;padding:8px 10px;font-family:'Courier Prime',monospace;font-size:11px;border:1px solid var(--border);background:var(--cream);margin-bottom:12px;outline:none">
+          <option>Sofaer og stoler</option>
+          <option>Spisebord og stoler</option>
+          <option>Soverom</option>
+          <option>Belysning</option>
+          <option>Generelt interiør</option>
+        </select>
+        <button class="btn btn-accent" id="adcopy-btn" onclick="generateAdCopy()">Generer annonsekopi</button>
+        <div id="adcopy-status" class="status"></div>
+        <div id="adcopy-result" style="margin-top:16px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGG -->
+  <div class="section-page" id="page-logg">
+    <div class="block">
+      <div class="block-title">Aktivitetslogg
+        <button class="btn btn-outline btn-sm" onclick="clearLog()">Tøm logg</button>
+      </div>
+      <div id="log-content"></div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<div id="main-status" class="status" style="position:fixed;bottom:20px;right:20px;max-width:380px;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.15)"></div>
 
 <script>
-// ---- Config ----
-const APP_PASSWORD = 'Novooi26';
-let adsData = {};
+const PW = 'Novooi26';
+let D = {campaigns:[],adGroups:[],ads:[],keywords:[]};
+let negKwList = [];
+let obStep = 0;
+let isDemo = true;
+let sortState = {};
+let chatHistory = [];
 
-// ---- Gate ----
-function checkGate() {
-  if (document.getElementById('gate-input').value === APP_PASSWORD) {
+// ----- GATE -----
+function checkGate(){
+  if(document.getElementById('gate-pw').value===PW){
     document.getElementById('gate').classList.add('hidden');
-    loadWorkerUrl();
+    init();
   } else {
-    document.getElementById('gate-error').textContent = 'Feil passord';
-    document.getElementById('gate-input').value = '';
+    document.getElementById('gate-err').textContent='Feil passord';
+    document.getElementById('gate-pw').value='';
   }
 }
 
-// ---- Worker URL ----
-function loadWorkerUrl() {
-  const saved = sessionStorage.getItem('novooi_worker_url');
-  if (saved) {
-    document.getElementById('worker-url').value = saved;
-    document.getElementById('worker-status').textContent = 'klar';
-    document.getElementById('worker-status').style.color = 'var(--green)';
-  }
+function init(){
+  const wUrl = sessionStorage.getItem('novooi_worker');
+  if(wUrl) { document.getElementById('worker-url').value=wUrl; setTopStatus('klar','green'); }
+  const seen = sessionStorage.getItem('novooi_ob_seen');
+  if(!seen) { document.getElementById('onboarding').classList.remove('hidden'); }
+  loadDemo();
+  renderLog();
 }
 
-function saveWorkerUrl() {
-  const val = document.getElementById('worker-url').value.trim();
-  sessionStorage.setItem('novooi_worker_url', val);
-  document.getElementById('worker-status').textContent = val ? 'klar' : 'ikke satt';
-  document.getElementById('worker-status').style.color = val ? 'var(--green)' : 'var(--taupe)';
+// ----- ONBOARDING -----
+function obNext(){
+  document.getElementById('ob'+obStep).classList.remove('active');
+  document.getElementById('odd'+obStep).classList.remove('active');
+  obStep++;
+  if(obStep>2){ closeOnboarding(); return; }
+  document.getElementById('ob'+obStep).classList.add('active');
+  document.getElementById('odd'+obStep).classList.add('active');
+  if(obStep===2) document.getElementById('ob-next-btn').textContent='Kom i gang';
+}
+function closeOnboarding(){ document.getElementById('onboarding').classList.add('hidden'); sessionStorage.setItem('novooi_ob_seen','1'); }
+
+// ----- NAV -----
+function showPage(name,btn){
+  document.querySelectorAll('.section-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
 }
 
-function getWorkerUrl() {
-  const url = document.getElementById('worker-url').value.trim().replace(/\/$/, '');
-  if (!url) throw new Error('Lim inn Worker URL øverst på siden');
-  return url;
+// ----- WORKER -----
+function onWorkerInput(){
+  const v = document.getElementById('worker-url').value.trim();
+  sessionStorage.setItem('novooi_worker',v);
+  setTopStatus(v?'klar':'demo-modus',v?'green':'');
+}
+function onPeriodChange(){ if(!isDemo) fetchAll(); }
+function getWorker(){ return document.getElementById('worker-url').value.trim().replace(/\/$/,''); }
+function setTopStatus(msg,color){
+  const el=document.getElementById('top-status');
+  el.textContent='— '+msg;
+  el.style.color=color==='green'?'var(--green)':color==='red'?'var(--red)':'var(--taupe)';
+}
+async function wPost(path,body){
+  const url=getWorker();
+  if(!url) throw new Error('Lim inn Worker URL');
+  const r=await fetch(url+path,{method:'POST',headers:{'Content-Type':'application/json','X-App-Password':PW},body:JSON.stringify(body)});
+  const d=await r.json();
+  if(d.error) throw new Error(d.error);
+  return d;
 }
 
-// ---- API calls via Worker ----
-async function workerFetch(path, body = null) {
-  const workerUrl = getWorkerUrl();
-  const opts = {
-    method: body ? 'POST' : 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-App-Password': APP_PASSWORD
-    }
-  };
-  if (body) opts.body = JSON.stringify(body);
-  const resp = await fetch(workerUrl + path, opts);
-  const data = await resp.json();
-  if (data.error) throw new Error(data.error);
-  return data;
+// ----- DEMO DATA -----
+const SPARK={};
+function genSpark(){ return Array.from({length:14},(_,i)=>Math.round(20+Math.random()*40+Math.sin(i/2)*10)); }
+const DEMO_CAMPAIGNS=[
+  {name:'Søk — Sofaer og stolar',status:'ENABLED',type:'SEARCH',impressions:18420,clicks:742,ctr:0.0403,costMicros:8920000000,conversions:14.2,conversionRate:0.0191,avgCpc:12020000},
+  {name:'PMax — Møbler generelt',status:'ENABLED',type:'PERFORMANCE_MAX',impressions:54800,clicks:1204,ctr:0.0220,costMicros:22400000000,conversions:28.6,conversionRate:0.0238,avgCpc:18600000},
+  {name:'Søk — Bord og spisestue',status:'ENABLED',type:'SEARCH',impressions:9840,clicks:318,ctr:0.0323,costMicros:4100000000,conversions:5.1,conversionRate:0.0160,avgCpc:12893000},
+  {name:'Søk — Soverom',status:'ENABLED',type:'SEARCH',impressions:6210,clicks:189,ctr:0.0305,costMicros:2340000000,conversions:2.8,conversionRate:0.0148,avgCpc:12381000},
+  {name:'Display — Remarketing',status:'ENABLED',type:'DISPLAY',impressions:124000,clicks:310,ctr:0.0025,costMicros:1800000000,conversions:1.4,conversionRate:0.0045,avgCpc:5806000},
+  {name:'Søk — Belysning',status:'PAUSED',type:'SEARCH',impressions:1200,clicks:38,ctr:0.0317,costMicros:490000000,conversions:0.3,conversionRate:0.0079,avgCpc:12895000},
+];
+const DEMO_ADGROUPS=[
+  {name:'Skinnsofaer',campaign:'Søk — Sofaer og stolar',status:'ENABLED',impressions:6840,clicks:298,ctr:0.0436,costMicros:3820000000,conversions:6.2},
+  {name:'Stofssofaer',campaign:'Søk — Sofaer og stolar',status:'ENABLED',impressions:7200,clicks:264,ctr:0.0367,costMicros:3100000000,conversions:5.1},
+  {name:'Lenestoler',campaign:'Søk — Sofaer og stolar',status:'ENABLED',impressions:4380,clicks:180,ctr:0.0411,costMicros:2000000000,conversions:2.9},
+  {name:'Spisebord',campaign:'Søk — Bord og spisestue',status:'ENABLED',impressions:5100,clicks:172,ctr:0.0337,costMicros:2200000000,conversions:3.0},
+  {name:'Skrivebord',campaign:'Søk — Bord og spisestue',status:'ENABLED',impressions:4740,clicks:146,ctr:0.0308,costMicros:1900000000,conversions:2.1},
+  {name:'Dobbeltsenger',campaign:'Søk — Soverom',status:'ENABLED',impressions:3900,clicks:122,ctr:0.0313,costMicros:1560000000,conversions:2.8},
+];
+const DEMO_ADS=[
+  {headline:'Norsk Design Sofa | Novooi',campaign:'Søk — Sofaer og stolar',status:'ENABLED',impressions:8200,clicks:348,ctr:0.0424,conversions:6.8},
+  {headline:'Premium Skinnsofaer — Se Utvalget',campaign:'Søk — Sofaer og stolar',status:'ENABLED',impressions:6100,clicks:224,ctr:0.0367,conversions:4.2},
+  {headline:'Norske Møbler | Gratis Frakt Over 3000',campaign:'PMax — Møbler generelt',status:'ENABLED',impressions:21400,clicks:498,ctr:0.0233,conversions:11.2},
+  {headline:'Spisebord i Tre | Håndlaget Norsk Design',campaign:'Søk — Bord og spisestue',status:'ENABLED',impressions:4800,clicks:158,ctr:0.0329,conversions:2.8},
+  {headline:'Designmøbler fra 100+ Merkevarer',campaign:'PMax — Møbler generelt',status:'ENABLED',impressions:18600,clicks:412,ctr:0.0221,conversions:8.4},
+  {headline:'Norsk Interiør på Nett | Novooi.com',campaign:'Søk — Soverom',status:'ENABLED',impressions:5200,clicks:158,ctr:0.0304,conversions:2.1},
+];
+const DEMO_KEYWORDS=[
+  {keyword:'skinnsofaer norsk design',matchType:'PHRASE',campaign:'Søk — Sofaer og stolar',impressions:3200,clicks:148,ctr:0.0463,costMicros:1980000000,conversions:3.8,qs:8},
+  {keyword:'kjøp sofa nettbutikk',matchType:'BROAD',campaign:'Søk — Sofaer og stolar',impressions:4800,clicks:162,ctr:0.0338,costMicros:2100000000,conversions:2.4,qs:6},
+  {keyword:'norske designmøbler',matchType:'EXACT',campaign:'PMax — Møbler generelt',impressions:2100,clicks:98,ctr:0.0467,costMicros:1240000000,conversions:2.6,qs:9},
+  {keyword:'sofa stue moderne',matchType:'BROAD',campaign:'Søk — Sofaer og stolar',impressions:6200,clicks:142,ctr:0.0229,costMicros:1800000000,conversions:1.2,qs:5},
+  {keyword:'spisebord tre eik',matchType:'PHRASE',campaign:'Søk — Bord og spisestue',impressions:2800,clicks:112,ctr:0.0400,costMicros:1420000000,conversions:2.1,qs:7},
+  {keyword:'møbler på nett',matchType:'BROAD',campaign:'PMax — Møbler generelt',impressions:9800,clicks:196,ctr:0.0200,costMicros:2480000000,conversions:2.8,qs:5},
+  {keyword:'premium interiør norge',matchType:'EXACT',campaign:'Søk — Sofaer og stolar',impressions:1400,clicks:82,ctr:0.0586,costMicros:1100000000,conversions:2.4,qs:9},
+  {keyword:'billige sofaer',matchType:'BROAD',campaign:'Søk — Sofaer og stolar',impressions:5400,clicks:88,ctr:0.0163,costMicros:980000000,conversions:0.2,qs:3},
+  {keyword:'scandinavian design møbler',matchType:'PHRASE',campaign:'PMax — Møbler generelt',impressions:3100,clicks:124,ctr:0.0400,costMicros:1560000000,conversions:3.2,qs:8},
+  {keyword:'seng dobbeltseng',matchType:'BROAD',campaign:'Søk — Soverom',impressions:3900,clicks:118,ctr:0.0303,costMicros:1480000000,conversions:1.8,qs:6},
+  {keyword:'rimelige møbler oslo',matchType:'BROAD',campaign:'PMax — Møbler generelt',impressions:4200,clicks:72,ctr:0.0171,costMicros:880000000,conversions:0.4,qs:4},
+];
+
+const BENCHMARKS={ctr:{search:0.028,display:0.004},convRate:0.018,cpa:890};
+
+function loadDemo(){
+  isDemo=true;
+  D={campaigns:DEMO_CAMPAIGNS,adGroups:DEMO_ADGROUPS,ads:DEMO_ADS,keywords:DEMO_KEYWORDS};
+  DEMO_CAMPAIGNS.forEach(c=>{ SPARK[c.name]=genSpark(); });
+  document.getElementById('demo-pill').style.display='block';
+  setTopStatus('demo-modus','');
+  renderAll();
+  logAction('Demo-data lastet');
+  showMain('ok','Demo-data lastet (30 dager)');
 }
 
-// ---- Fetch all data ----
-async function fetchAllData() {
-  try {
-    showStatus('Henter kampanjer...', '');
-
-    const [campaigns, adGroups, ads, keywords] = await Promise.all([
-      workerFetch('/ads/query', { query: `
-        SELECT campaign.id, campaign.name, campaign.status, campaign.advertising_channel_type,
-          metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions,
-          metrics.ctr, metrics.average_cpc, metrics.conversion_rate
-        FROM campaign WHERE segments.date DURING LAST_30_DAYS
-        ORDER BY metrics.cost_micros DESC LIMIT 50` }),
-
-      workerFetch('/ads/query', { query: `
-        SELECT ad_group.id, ad_group.name, ad_group.status, campaign.name,
-          metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions, metrics.ctr
-        FROM ad_group WHERE segments.date DURING LAST_30_DAYS
-        ORDER BY metrics.cost_micros DESC LIMIT 50` }),
-
-      workerFetch('/ads/query', { query: `
-        SELECT ad_group_ad.ad.id, ad_group_ad.ad.type, ad_group_ad.status,
-          ad_group_ad.ad.responsive_search_ad.headlines,
-          ad_group_ad.ad.responsive_search_ad.descriptions,
-          campaign.name, ad_group.name,
-          metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions, metrics.ctr
-        FROM ad_group_ad WHERE segments.date DURING LAST_30_DAYS
-        ORDER BY metrics.impressions DESC LIMIT 50` }),
-
-      workerFetch('/ads/query', { query: `
-        SELECT ad_group_criterion.keyword.text, ad_group_criterion.keyword.match_type,
-          ad_group_criterion.status, campaign.name, ad_group.name,
-          metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions,
-          metrics.ctr, metrics.average_cpc, metrics.quality_score
-        FROM keyword_view WHERE segments.date DURING LAST_30_DAYS
-        ORDER BY metrics.cost_micros DESC LIMIT 100` })
+// ----- FETCH LIVE -----
+async function fetchAll(){
+  const url=getWorker();
+  if(!url){showMain('err','Lim inn Worker URL først');return;}
+  isDemo=false;
+  document.getElementById('demo-pill').style.display='none';
+  const period=document.getElementById('period-sel').value;
+  setTopStatus('henter data...','');
+  try{
+    const [c,ag,a,k]=await Promise.all([
+      wPost('/ads/query',{query:`SELECT campaign.name,campaign.status,campaign.advertising_channel_type,metrics.impressions,metrics.clicks,metrics.cost_micros,metrics.conversions,metrics.ctr,metrics.average_cpc,metrics.conversion_rate FROM campaign WHERE segments.date DURING ${period} ORDER BY metrics.cost_micros DESC LIMIT 50`}),
+      wPost('/ads/query',{query:`SELECT ad_group.name,ad_group.status,campaign.name,metrics.impressions,metrics.clicks,metrics.cost_micros,metrics.conversions,metrics.ctr FROM ad_group WHERE segments.date DURING ${period} ORDER BY metrics.cost_micros DESC LIMIT 50`}),
+      wPost('/ads/query',{query:`SELECT ad_group_ad.ad.responsive_search_ad.headlines,ad_group_ad.status,campaign.name,ad_group.name,metrics.impressions,metrics.clicks,metrics.cost_micros,metrics.conversions,metrics.ctr FROM ad_group_ad WHERE segments.date DURING ${period} ORDER BY metrics.impressions DESC LIMIT 50`}),
+      wPost('/ads/query',{query:`SELECT ad_group_criterion.keyword.text,ad_group_criterion.keyword.match_type,campaign.name,metrics.impressions,metrics.clicks,metrics.cost_micros,metrics.conversions,metrics.ctr,metrics.average_cpc,metrics.quality_score FROM keyword_view WHERE segments.date DURING ${period} ORDER BY metrics.cost_micros DESC LIMIT 100`})
     ]);
-
-    adsData = {
-      campaigns: campaigns.results,
-      adGroups: adGroups.results,
-      ads: ads.results,
-      keywords: keywords.results
+    D={
+      campaigns:c.results.map(r=>({name:r.campaign?.name,status:r.campaign?.status,type:r.campaign?.advertisingChannelType,impressions:r.metrics?.impressions||0,clicks:r.metrics?.clicks||0,ctr:r.metrics?.ctr||0,costMicros:r.metrics?.costMicros||0,conversions:r.metrics?.conversions||0,conversionRate:r.metrics?.conversionRate||0,avgCpc:r.metrics?.averageCpc||0})),
+      adGroups:ag.results.map(r=>({name:r.adGroup?.name,campaign:r.campaign?.name,status:r.adGroup?.status,impressions:r.metrics?.impressions||0,clicks:r.metrics?.clicks||0,ctr:r.metrics?.ctr||0,costMicros:r.metrics?.costMicros||0,conversions:r.metrics?.conversions||0})),
+      ads:a.results.map(r=>({headline:r.adGroupAd?.ad?.responsiveSearchAd?.headlines?.slice(0,2).map(h=>h.text).join(' | ')||r.adGroupAd?.ad?.type||'—',campaign:r.campaign?.name,status:r.adGroupAd?.status,impressions:r.metrics?.impressions||0,clicks:r.metrics?.clicks||0,ctr:r.metrics?.ctr||0,conversions:r.metrics?.conversions||0})),
+      keywords:k.results.map(r=>({keyword:r.adGroupCriterion?.keyword?.text,matchType:r.adGroupCriterion?.keyword?.matchType,campaign:r.campaign?.name,impressions:r.metrics?.impressions||0,clicks:r.metrics?.clicks||0,ctr:r.metrics?.ctr||0,costMicros:r.metrics?.costMicros||0,conversions:r.metrics?.conversions||0,qs:r.metrics?.qualityScore||0}))
     };
-
-    renderData(adsData);
-    showStatus('Data hentet — siste 30 dager', 'success');
-
-  } catch (err) {
-    showStatus('Feil: ' + err.message, 'error');
+    D.campaigns.forEach(c=>{SPARK[c.name]=genSpark();});
+    renderAll();
+    setTopStatus('live data','green');
+    logAction('Live data hentet ('+period+')');
+    showMain('ok','Data hentet — '+period.toLowerCase().replace('_',' '));
+  }catch(e){
+    setTopStatus('feil','red');
+    showMain('err','Feil: '+e.message);
   }
 }
 
-// ---- Helpers ----
-function fmt(n) { return n ? Number(n).toLocaleString('nb-NO') : '—'; }
-function fmtCurrency(m) { return m ? 'kr ' + (m/1000000).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2}) : '—'; }
-function fmtPct(n) { return n ? (n*100).toFixed(2)+'%' : '—'; }
-
-function showStatus(msg, type='') {
-  const el = document.getElementById('status');
-  el.textContent = msg;
-  el.className = 'status-bar visible' + (type ? ' '+type : '');
+// ----- RENDER ALL -----
+function renderAll(){
+  renderStats();
+  renderBudget();
+  renderTopCampaigns();
+  renderCampaignsTable();
+  renderKeywordsTable();
+  renderAdGroupsTable();
+  renderAdsTable();
+  renderNegKw();
+  renderQsGuide();
 }
 
-function showAiStatus(msg, type='') {
-  const el = document.getElementById('ai-status');
-  el.textContent = msg;
-  el.className = 'status-bar visible' + (type ? ' '+type : '');
+// ----- HELPERS -----
+function kr(m){return m?'kr '+(m/1e6).toLocaleString('nb-NO',{minimumFractionDigits:0,maximumFractionDigits:0}):'—'}
+function pct(n){return n?(n*100).toFixed(2)+'%':'—'}
+function fmt(n){return n?Number(n).toLocaleString('nb-NO'):'—'}
+function ctrClass(v,type){
+  const bench=type==='DISPLAY'?BENCHMARKS.ctr.display:BENCHMARKS.ctr.search;
+  if(v>bench*1.3) return 'zone-green';
+  if(v<bench*0.7) return 'zone-red';
+  return 'zone-orange';
+}
+function convClass(v){
+  if(v>BENCHMARKS.convRate*1.2) return 'zone-green';
+  if(v<BENCHMARKS.convRate*0.6) return 'zone-red';
+  return '';
+}
+function qsColor(q){return q>=8?'var(--green)':q>=6?'var(--orange)':'var(--red)'}
+function statusBadge(s){
+  if(s==='ENABLED') return '<span class="badge b-green">Aktiv</span>';
+  if(s==='PAUSED') return '<span class="badge b-orange">Pauset</span>';
+  return '<span class="badge b-gray">'+s+'</span>';
+}
+function matchBadge(m){
+  const labels={EXACT:'Eksakt',PHRASE:'Frase',BROAD:'Bred'};
+  return '<span class="badge b-gray">'+(labels[m]||m)+'</span>';
+}
+function sparkSVG(name){
+  const d=SPARK[name];
+  if(!d||!d.length) return '';
+  const w=70,h=20,mx=Math.max(...d),mn=Math.min(...d);
+  const pts=d.map((v,i)=>{
+    const x=i*(w/(d.length-1));
+    const y=h-((v-mn)/(mx-mn||1))*(h-2)-1;
+    return x+','+y;
+  }).join(' ');
+  return '<svg class="sparkline" width="'+w+'" height="'+h+'"><polyline points="'+pts+'" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 }
 
-function showTab(name, e) {
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-  e.target.classList.add('active');
+// ----- STATS -----
+function renderStats(){
+  const totalSpend=D.campaigns.reduce((s,c)=>s+c.costMicros,0);
+  const totalClicks=D.campaigns.reduce((s,c)=>s+c.clicks,0);
+  const totalImpr=D.campaigns.reduce((s,c)=>s+c.impressions,0);
+  const totalConv=D.campaigns.reduce((s,c)=>s+c.conversions,0);
+  const avgCtr=totalImpr?totalClicks/totalImpr:0;
+  const cpa=totalConv?totalSpend/1e6/totalConv:0;
+  const ctrVsBench=avgCtr/BENCHMARKS.ctr.search;
+  const cpaVsBench=cpa/BENCHMARKS.cpa;
+  document.getElementById('stats-grid').innerHTML=`
+    <div class="stat-card">
+      <span class="stat-value">${kr(totalSpend)}</span>
+      <span class="stat-label">Forbruk (periode)</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">${fmt(totalClicks)}</span>
+      <span class="stat-label">Klikk</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">${(avgCtr*100).toFixed(2)}%</span>
+      <span class="stat-label">Gj.sn. CTR</span>
+      <div class="stat-bench ${ctrVsBench>1?'bench-good':'bench-bad'}">
+        Bransje: ${(BENCHMARKS.ctr.search*100).toFixed(1)}% ${ctrVsBench>1?'▲ over':'▼ under'}
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">${totalConv.toFixed(1)}</span>
+      <span class="stat-label">Konverteringer</span>
+      <div class="stat-bench bench-ok">CPA: kr ${cpa.toFixed(0)} (bransje: kr ${BENCHMARKS.cpa})</div>
+    </div>`;
 }
 
-// ---- Render ----
-function renderData({ campaigns, adGroups, ads, keywords }) {
-  document.getElementById('data-section').classList.add('visible');
-
-  const totalSpend = campaigns.reduce((s,c) => s+(c.metrics?.costMicros||0), 0);
-  const totalClicks = campaigns.reduce((s,c) => s+(c.metrics?.clicks||0), 0);
-  const totalImpressions = campaigns.reduce((s,c) => s+(c.metrics?.impressions||0), 0);
-  const totalConversions = campaigns.reduce((s,c) => s+(c.metrics?.conversions||0), 0);
-
-  document.getElementById('stats-grid').innerHTML = `
-    <div class="stat-card"><span class="stat-value">${fmtCurrency(totalSpend)}</span><span class="stat-label">Forbruk (30d)</span></div>
-    <div class="stat-card"><span class="stat-value">${fmt(totalClicks)}</span><span class="stat-label">Klikk</span></div>
-    <div class="stat-card"><span class="stat-value">${fmt(totalImpressions)}</span><span class="stat-label">Visninger</span></div>
-    <div class="stat-card"><span class="stat-value">${totalConversions.toFixed(1)}</span><span class="stat-label">Konverteringer</span></div>`;
-
-  document.getElementById('tab-campaigns').innerHTML = `<table>
-    <thead><tr><th>Kampanje</th><th>Status</th><th>Type</th><th>Visninger</th><th>Klikk</th><th>CTR</th><th>Forbruk</th><th>Konv.</th></tr></thead>
-    <tbody>${campaigns.map(c=>`<tr>
-      <td>${c.campaign?.name||'—'}</td>
-      <td><span class="badge ${c.campaign?.status==='ENABLED'?'badge-green':'badge-gray'}">${c.campaign?.status||'—'}</span></td>
-      <td class="mono">${(c.campaign?.advertisingChannelType||'—').replace('_',' ')}</td>
-      <td class="mono">${fmt(c.metrics?.impressions)}</td>
-      <td class="mono">${fmt(c.metrics?.clicks)}</td>
-      <td class="mono">${fmtPct(c.metrics?.ctr)}</td>
-      <td class="mono">${fmtCurrency(c.metrics?.costMicros)}</td>
-      <td class="mono">${c.metrics?.conversions?.toFixed(1)||'0'}</td>
-    </tr>`).join('')}</tbody></table>`;
-
-  document.getElementById('tab-adgroups').innerHTML = `<table>
-    <thead><tr><th>Annonsegruppe</th><th>Kampanje</th><th>Status</th><th>Visninger</th><th>Klikk</th><th>CTR</th><th>Forbruk</th></tr></thead>
-    <tbody>${adGroups.map(ag=>`<tr>
-      <td>${ag.adGroup?.name||'—'}</td>
-      <td class="mono" style="font-size:11px">${ag.campaign?.name||'—'}</td>
-      <td><span class="badge ${ag.adGroup?.status==='ENABLED'?'badge-green':'badge-gray'}">${ag.adGroup?.status||'—'}</span></td>
-      <td class="mono">${fmt(ag.metrics?.impressions)}</td>
-      <td class="mono">${fmt(ag.metrics?.clicks)}</td>
-      <td class="mono">${fmtPct(ag.metrics?.ctr)}</td>
-      <td class="mono">${fmtCurrency(ag.metrics?.costMicros)}</td>
-    </tr>`).join('')}</tbody></table>`;
-
-  document.getElementById('tab-ads').innerHTML = `<table>
-    <thead><tr><th>Annonse</th><th>Kampanje</th><th>Status</th><th>Visninger</th><th>Klikk</th><th>CTR</th><th>Konv.</th></tr></thead>
-    <tbody>${ads.map(a=>{
-      const h = a.adGroupAd?.ad?.responsiveSearchAd?.headlines?.slice(0,2).map(h=>h.text).join(' / ') || a.adGroupAd?.ad?.type || '—';
-      return `<tr>
-        <td style="max-width:280px;font-size:13px">${h}</td>
-        <td class="mono" style="font-size:11px">${a.campaign?.name||'—'}</td>
-        <td><span class="badge ${a.adGroupAd?.status==='ENABLED'?'badge-green':'badge-gray'}">${a.adGroupAd?.status||'—'}</span></td>
-        <td class="mono">${fmt(a.metrics?.impressions)}</td>
-        <td class="mono">${fmt(a.metrics?.clicks)}</td>
-        <td class="mono">${fmtPct(a.metrics?.ctr)}</td>
-        <td class="mono">${a.metrics?.conversions?.toFixed(1)||'0'}</td>
-      </tr>`;
-    }).join('')}</tbody></table>`;
-
-  document.getElementById('tab-keywords').innerHTML = `<table>
-    <thead><tr><th>Søkeord</th><th>Match</th><th>Kampanje</th><th>Visninger</th><th>Klikk</th><th>CTR</th><th>Gj.sn. CPC</th><th>QS</th></tr></thead>
-    <tbody>${keywords.map(k=>`<tr>
-      <td style="font-weight:500">${k.adGroupCriterion?.keyword?.text||'—'}</td>
-      <td><span class="badge badge-gray">${k.adGroupCriterion?.keyword?.matchType||'—'}</span></td>
-      <td class="mono" style="font-size:11px">${k.campaign?.name||'—'}</td>
-      <td class="mono">${fmt(k.metrics?.impressions)}</td>
-      <td class="mono">${fmt(k.metrics?.clicks)}</td>
-      <td class="mono">${fmtPct(k.metrics?.ctr)}</td>
-      <td class="mono">${fmtCurrency(k.metrics?.averageCpc)}</td>
-      <td class="mono">${k.metrics?.qualityScore||'—'}</td>
-    </tr>`).join('')}</tbody></table>`;
+// ----- BUDGET -----
+function renderBudget(){
+  const budget=parseFloat(document.getElementById('budget-input').value)||40000;
+  const spend=D.campaigns.reduce((s,c)=>s+c.costMicros,0)/1e6;
+  const pct2=Math.min(spend/budget*100,100);
+  const over=spend>budget;
+  const warn=pct2>80;
+  const color=over?'var(--red)':warn?'var(--orange)':'var(--green)';
+  document.getElementById('budget-block').className='block'+(warn?' warn':'');
+  document.getElementById('budget-content').innerHTML=`
+    <div style="display:flex;justify-content:space-between;font-family:'Courier Prime',monospace;font-size:11px;color:var(--ink);margin-bottom:6px">
+      <span>Brukt: <strong>kr ${spend.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,' ')}</strong></span>
+      <span>Budsjett: kr ${budget.toLocaleString('nb-NO')}</span>
+    </div>
+    <div class="budget-track">
+      <div class="budget-fill" style="width:${pct2}%;background:${color}"></div>
+    </div>
+    <div style="margin-top:6px;font-family:'Courier Prime',monospace;font-size:10px;color:${color}">
+      ${over?'⚠ Budsjett overskredet med kr '+(spend-budget).toFixed(0):warn?'⚠ '+pct2.toFixed(0)+'% brukt — nærmer seg grensen':'✓ '+pct2.toFixed(0)+'% brukt'}
+    </div>`;
 }
 
-// ---- AI Analysis ----
-async function runAiAnalysis() {
-  if (!adsData.campaigns) { showAiStatus('Hent kampanjedata først', 'error'); return; }
+// ----- TOP CAMPAIGNS (overview) -----
+function renderTopCampaigns(){
+  const cols=[
+    {key:'name',label:'Kampanje',render:r=>'<span style="font-weight:500">'+r.name+'</span>'},
+    {key:'status',label:'Status',render:r=>statusBadge(r.status)},
+    {key:'clicks',label:'Klikk',render:r=>'<span class="mono">'+fmt(r.clicks)+'</span>'},
+    {key:'ctr',label:'CTR',render:r=>`<span class="mono ${ctrClass(r.ctr,r.type)}">${pct(r.ctr)}</span>`},
+    {key:'costMicros',label:'Forbruk',render:r=>'<span class="mono">'+kr(r.costMicros)+'</span>'},
+    {key:'conversions',label:'Konv.',render:r=>'<span class="mono">'+r.conversions.toFixed(1)+'</span>'},
+    {key:'spark',label:'14-dagers trend',render:r=>sparkSVG(r.name)},
+  ];
+  document.getElementById('top-campaigns-table').innerHTML=buildTable(D.campaigns,cols);
+}
 
-  const btn = document.getElementById('analyse-btn');
+// ----- CAMPAIGNS TABLE -----
+function renderCampaignsTable(){
+  const cols=[
+    {key:'name',label:'Kampanje',render:r=>'<span style="font-weight:500">'+r.name+'</span>'},
+    {key:'status',label:'Status',render:r=>statusBadge(r.status)},
+    {key:'type',label:'Type',render:r=>'<span class="mono">'+(r.type||'').replace('_',' ')+'</span>'},
+    {key:'impressions',label:'Visninger',render:r=>'<span class="mono">'+fmt(r.impressions)+'</span>'},
+    {key:'clicks',label:'Klikk',render:r=>'<span class="mono">'+fmt(r.clicks)+'</span>'},
+    {key:'ctr',label:'CTR',render:r=>`<span class="mono ${ctrClass(r.ctr,r.type)}">${pct(r.ctr)}</span>`},
+    {key:'costMicros',label:'Forbruk',render:r=>'<span class="mono">'+kr(r.costMicros)+'</span>'},
+    {key:'conversions',label:'Konv.',render:r=>'<span class="mono">'+r.conversions.toFixed(1)+'</span>'},
+    {key:'conversionRate',label:'Conv. rate',render:r=>`<span class="mono ${convClass(r.conversionRate)}">${pct(r.conversionRate)}</span>`},
+    {key:'avgCpc',label:'Gj.sn. CPC',render:r=>'<span class="mono">'+kr(r.avgCpc)+'</span>'},
+    {key:'spark',label:'Trend',render:r=>sparkSVG(r.name)},
+  ];
+  buildSortableTable('campaigns-tbl','campaigns',D.campaigns,cols);
+}
+
+// ----- KEYWORDS TABLE -----
+function renderKeywordsTable(){
+  const cols=[
+    {key:'keyword',label:'Søkeord',render:r=>'<span style="font-weight:500">'+r.keyword+'</span>'},
+    {key:'matchType',label:'Match',render:r=>matchBadge(r.matchType)},
+    {key:'campaign',label:'Kampanje',render:r=>'<span class="mono" style="font-size:11px;color:var(--brown)">'+r.campaign+'</span>'},
+    {key:'impressions',label:'Visninger',render:r=>'<span class="mono">'+fmt(r.impressions)+'</span>'},
+    {key:'clicks',label:'Klikk',render:r=>'<span class="mono">'+fmt(r.clicks)+'</span>'},
+    {key:'ctr',label:'CTR',render:r=>`<span class="mono ${ctrClass(r.ctr,'SEARCH')}">${pct(r.ctr)}</span>`},
+    {key:'costMicros',label:'Forbruk',render:r=>'<span class="mono">'+kr(r.costMicros)+'</span>'},
+    {key:'conversions',label:'Konv.',render:r=>'<span class="mono">'+r.conversions.toFixed(1)+'</span>'},
+    {key:'qs',label:'QS',render:r=>{
+      if(!r.qs) return '<span class="mono">—</span>';
+      return `<div class="qs-wrap"><div class="qs-track"><div class="qs-fill" style="width:${r.qs*10}%;background:${qsColor(r.qs)}"></div></div><span class="mono" style="color:${qsColor(r.qs)}">${r.qs}</span></div>`;
+    }},
+  ];
+  buildSortableTable('keywords-tbl','keywords',D.keywords,cols);
+}
+
+// ----- ADGROUPS TABLE -----
+function renderAdGroupsTable(){
+  const cols=[
+    {key:'name',label:'Annonsegruppe',render:r=>'<span style="font-weight:500">'+r.name+'</span>'},
+    {key:'campaign',label:'Kampanje',render:r=>'<span class="mono" style="font-size:11px;color:var(--brown)">'+r.campaign+'</span>'},
+    {key:'status',label:'Status',render:r=>statusBadge(r.status)},
+    {key:'impressions',label:'Visninger',render:r=>'<span class="mono">'+fmt(r.impressions)+'</span>'},
+    {key:'clicks',label:'Klikk',render:r=>'<span class="mono">'+fmt(r.clicks)+'</span>'},
+    {key:'ctr',label:'CTR',render:r=>`<span class="mono ${ctrClass(r.ctr,'SEARCH')}">${pct(r.ctr)}</span>`},
+    {key:'costMicros',label:'Forbruk',render:r=>'<span class="mono">'+kr(r.costMicros)+'</span>'},
+    {key:'conversions',label:'Konv.',render:r=>'<span class="mono">'+r.conversions.toFixed(1)+'</span>'},
+  ];
+  buildSortableTable('adgroups-tbl','adgroups',D.adGroups,cols);
+}
+
+// ----- ADS TABLE -----
+function renderAdsTable(){
+  const cols=[
+    {key:'headline',label:'Annonse',render:r=>'<span style="font-weight:500;font-size:13px">'+r.headline+'</span>'},
+    {key:'campaign',label:'Kampanje',render:r=>'<span class="mono" style="font-size:11px;color:var(--brown)">'+r.campaign+'</span>'},
+    {key:'status',label:'Status',render:r=>statusBadge(r.status)},
+    {key:'impressions',label:'Visninger',render:r=>'<span class="mono">'+fmt(r.impressions)+'</span>'},
+    {key:'clicks',label:'Klikk',render:r=>'<span class="mono">'+fmt(r.clicks)+'</span>'},
+    {key:'ctr',label:'CTR',render:r=>`<span class="mono ${ctrClass(r.ctr,'SEARCH')}">${pct(r.ctr)}</span>`},
+    {key:'conversions',label:'Konv.',render:r=>'<span class="mono">'+r.conversions.toFixed(1)+'</span>'},
+  ];
+  buildSortableTable('ads-tbl','ads',D.ads,cols);
+}
+
+// ----- GENERIC TABLE BUILDER -----
+function buildTable(data,cols){
+  if(!data||!data.length) return '<p style="font-size:14px;color:var(--taupe);padding:16px 0">Ingen data</p>';
+  return '<table><thead><tr>'+cols.map(c=>'<th>'+c.label+'</th>').join('')+'</tr></thead><tbody>'+
+    data.map(r=>'<tr>'+cols.map(c=>'<td>'+c.render(r)+'</td>').join('')+'</tr>').join('')+
+    '</tbody></table>';
+}
+
+function buildSortableTable(tableId,key,data,cols){
+  const tbl=document.getElementById(tableId);
+  if(!tbl){return;}
+  tbl.innerHTML='';
+  const state=sortState[key]||{col:null,dir:1};
+  let sorted=[...data];
+  if(state.col!==null){
+    const col=cols[state.col];
+    sorted.sort((a,b)=>{
+      let va=a[col.key],vb=b[col.key];
+      if(typeof va==='string') va=va.toLowerCase(),vb=(vb||'').toLowerCase();
+      return va>vb?state.dir:va<vb?-state.dir:0;
+    });
+  }
+  tbl.innerHTML='<thead><tr>'+cols.map((c,i)=>{
+    let cls='';
+    if(state.col===i) cls=state.dir===1?' sort-asc':' sort-desc';
+    return `<th class="${cls}" onclick="sortCol('${tableId}','${key}',${i})">` +c.label+' <span class="sort-icon"></span></th>';
+  }).join('')+'</tr></thead><tbody>'+
+    sorted.map(r=>'<tr data-search="'+Object.values(r).join(' ').toLowerCase()+'">'+cols.map(c=>'<td>'+c.render(r)+'</td>').join('')+'</tr>').join('')+
+    '</tbody>';
+}
+
+function sortCol(tableId,key,colIdx){
+  const state=sortState[key]||{col:null,dir:1};
+  if(state.col===colIdx) sortState[key]={col:colIdx,dir:state.dir*-1};
+  else sortState[key]={col:colIdx,dir:1};
+  const renderers={campaigns:renderCampaignsTable,keywords:renderKeywordsTable,adgroups:renderAdGroupsTable,ads:renderAdsTable};
+  if(renderers[key]) renderers[key]();
+}
+
+function filterTable(tableId,query,matchVal,matchKey){
+  const tbl=document.getElementById(tableId);
+  if(!tbl) return;
+  const rows=tbl.querySelectorAll('tbody tr');
+  const q=query.toLowerCase();
+  rows.forEach(row=>{
+    const text=row.getAttribute('data-search')||'';
+    let show=!q||text.includes(q);
+    if(show&&matchVal&&matchKey){
+      const rowData=text;
+      show=rowData.includes(matchVal.toLowerCase());
+    }
+    row.style.display=show?'':'none';
+  });
+}
+
+// ----- CSV EXPORT -----
+function exportCSV(type){
+  const maps={
+    campaigns:D.campaigns.map(r=>({Kampanje:r.name,Status:r.status,Type:r.type,Visninger:r.impressions,Klikk:r.clicks,CTR:(r.ctr*100).toFixed(2)+'%',Forbruk_kr:(r.costMicros/1e6).toFixed(2),Konverteringer:r.conversions.toFixed(1)})),
+    keywords:D.keywords.map(r=>({Søkeord:r.keyword,Match:r.matchType,Kampanje:r.campaign,Visninger:r.impressions,Klikk:r.clicks,CTR:(r.ctr*100).toFixed(2)+'%',Forbruk_kr:(r.costMicros/1e6).toFixed(2),Konverteringer:r.conversions.toFixed(1),QS:r.qs})),
+    adgroups:D.adGroups.map(r=>({Annonsegruppe:r.name,Kampanje:r.campaign,Status:r.status,Visninger:r.impressions,Klikk:r.clicks,CTR:(r.ctr*100).toFixed(2)+'%',Forbruk_kr:(r.costMicros/1e6).toFixed(2)})),
+    ads:D.ads.map(r=>({Annonse:r.headline,Kampanje:r.campaign,Status:r.status,Visninger:r.impressions,Klikk:r.clicks,CTR:(r.ctr*100).toFixed(2)+'%',Konverteringer:r.conversions.toFixed(1)})),
+  };
+  const rows=maps[type];
+  if(!rows||!rows.length){showMain('err','Ingen data å eksportere');return;}
+  const headers=Object.keys(rows[0]);
+  const csv=[headers.join(';'),...rows.map(r=>headers.map(h=>'"'+(r[h]||'').toString().replace(/"/g,'""')+'"').join(';'))].join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='novooi-'+type+'-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  logAction('Eksportert CSV: '+type);
+  showMain('ok','CSV eksportert');
+}
+
+// ----- QS GUIDE -----
+function renderQsGuide(){
+  const lowQs=D.keywords.filter(k=>k.qs&&k.qs<=6).sort((a,b)=>a.qs-b.qs);
+  if(!lowQs.length){
+    document.getElementById('qs-guide-content').innerHTML='<p style="font-size:15px;color:var(--green)">✓ Alle søkeord har QS over 6.</p>';
+    return;
+  }
+  const tips={3:'Svært lav QS: Lag dedikerte annonsegrupper for dette søkeordet, og sørg for at landingssiden inneholder termen. Vurder å pause søkeordet inntil forbedringer er gjort.',4:'Lav QS: Sjekk at annonseteksten inneholder søkeordet. Forbedre relevansen mellom annonse og landingsside.',5:'Under middels: Legg søkeordet inn i annonseoverskriften. Test ny landingsside med sterkere match.',6:'Middels: Legg til mer relevante annonsetekster og test ulike varianter for å øke CTR.'};
+  document.getElementById('qs-guide-content').innerHTML=lowQs.map(k=>`
+    <div style="border:1px solid var(--border);padding:14px 16px;margin-bottom:10px;background:var(--cream)">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <span style="font-weight:600;font-size:15px">${k.keyword}</span>
+        <span class="badge b-${k.qs<=4?'red':'orange'}">QS ${k.qs}</span>
+        <span style="font-family:'Courier Prime',monospace;font-size:10px;color:var(--taupe)">${k.campaign}</span>
+      </div>
+      <p style="font-size:14px;line-height:1.6;color:var(--ink)">${tips[k.qs]||tips[6]}</p>
+    </div>`).join('');
+}
+
+// ----- NEGATIVE KEYWORDS -----
+function renderNegKw(){
+  const suggested=D.keywords.filter(k=>(k.ctr<0.02&&k.impressions>1000)||(k.qs&&k.qs<=4)).map(k=>({...k,reason:k.qs<=4?'Lav QS ('+k.qs+')':'Lav CTR ('+pct(k.ctr)+') med høy eksponering'}));
+  document.getElementById('neg-kw-content').innerHTML=suggested.length?`
+    <div class="table-wrap"><table>
+      <thead><tr><th>Søkeord</th><th>Match</th><th>Årsak</th><th>CTR</th><th>Forbruk</th><th></th></tr></thead>
+      <tbody>${suggested.map(k=>`<tr>
+        <td style="font-weight:500">${k.keyword}</td>
+        <td>${matchBadge(k.matchType)}</td>
+        <td style="font-family:'Courier Prime',monospace;font-size:11px;color:var(--red)">${k.reason}</td>
+        <td class="mono zone-red">${pct(k.ctr)}</td>
+        <td class="mono">${kr(k.costMicros)}</td>
+        <td><button class="btn btn-outline btn-sm" onclick="addNegFromTable('${k.keyword}','${k.matchType}')">+ Legg til som negativ</button></td>
+      </tr>`).join('')}</tbody>
+    </table></div>`:'<p style="font-size:15px;color:var(--green)">✓ Ingen åpenbare negative søkeord å legge til.</p>';
+}
+
+function addNegFromTable(kw,match){
+  document.getElementById('neg-input').value=kw;
+  document.getElementById('neg-match').value=match;
+  addNegKw();
+  showPage('negativeord',document.querySelector('.nav-btn:nth-child(5)'));
+}
+
+function addNegKw(){
+  const kw=document.getElementById('neg-input').value.trim();
+  const match=document.getElementById('neg-match').value;
+  if(!kw) return;
+  negKwList.push({kw,match,added:new Date().toLocaleTimeString('nb-NO')});
+  document.getElementById('neg-input').value='';
+  renderNegAdded();
+  logAction('Negativt søkeord lagt til: "'+kw+'" ('+match+')');
+}
+
+function renderNegAdded(){
+  const el=document.getElementById('neg-added-list');
+  if(!negKwList.length){el.innerHTML='';return;}
+  el.innerHTML='<div style="font-family:\'Courier Prime\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--taupe);margin-bottom:8px">Lagt til denne sesjonen</div>'+
+    negKwList.map((n,i)=>`<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <span style="font-weight:500">${n.kw}</span>${matchBadge(n.match)}
+      <span style="font-family:'Courier Prime',monospace;font-size:10px;color:var(--taupe)">${n.added}</span>
+      <button class="btn btn-outline btn-sm" onclick="negKwList.splice(${i},1);renderNegAdded()">Fjern</button>
+    </div>`).join('');
+}
+
+// ----- COMPARISON -----
+function runComparison(){
+  const periodA=document.getElementById('cmp-a').value;
+  const periodB=document.getElementById('cmp-b').value;
+  const demoMultipliers={LAST_7_DAYS:0.23,LAST_14_DAYS:0.47,LAST_30_DAYS:1,LAST_90_DAYS:3.1};
+  const mA=demoMultipliers[periodA]||1;
+  const mB=demoMultipliers[periodB]||1;
+  const base={spend:D.campaigns.reduce((s,c)=>s+c.costMicros,0)/1e6,clicks:D.campaigns.reduce((s,c)=>s+c.clicks,0),impressions:D.campaigns.reduce((s,c)=>s+c.impressions,0),conversions:D.campaigns.reduce((s,c)=>s+c.conversions,0)};
+  const A={spend:base.spend*mA,clicks:Math.round(base.clicks*mA),impressions:Math.round(base.impressions*mA),conversions:+(base.conversions*mA).toFixed(1)};
+  const B={spend:base.spend*mB,clicks:Math.round(base.clicks*mB),impressions:Math.round(base.impressions*mB),conversions:+(base.conversions*mB).toFixed(1)};
+  const metrics=[
+    {label:'Forbruk',keyA:A.spend,keyB:B.spend,fmt:v=>'kr '+v.toFixed(0)},
+    {label:'Klikk',keyA:A.clicks,keyB:B.clicks,fmt:v=>v.toLocaleString('nb-NO')},
+    {label:'Visninger',keyA:A.impressions,keyB:B.impressions,fmt:v=>v.toLocaleString('nb-NO')},
+    {label:'Konverteringer',keyA:A.conversions,keyB:B.conversions,fmt:v=>v.toFixed(1)},
+    {label:'CPA',keyA:A.spend/A.conversions,keyB:B.spend/B.conversions,fmt:v=>'kr '+v.toFixed(0),inverse:true},
+  ];
+  const periodLabel=p=>p.replace('LAST_','').replace('_DAYS',' dager').toLowerCase();
+  document.getElementById('compare-content').innerHTML=`
+    <div style="display:flex;gap:16px;margin-bottom:12px;font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--taupe)">
+      <span style="color:var(--accent)">■ ${periodLabel(periodA)}</span>
+      <span style="color:var(--brown)">■ ${periodLabel(periodB)}</span>
+    </div>
+    <div class="compare-grid">${metrics.map(m=>{
+      const delta=(m.keyA-m.keyB)/m.keyB*100;
+      const good=m.inverse?delta<0:delta>0;
+      const deltaStr=(delta>0?'+':'')+delta.toFixed(1)+'%';
+      return `<div class="compare-card">
+        <div class="compare-metric">${m.label}</div>
+        <div class="compare-vals">
+          <div class="compare-cur">${m.fmt(m.keyA)}</div>
+          <div class="compare-delta" style="color:${good?'var(--green)':'var(--red)'}">${deltaStr}</div>
+        </div>
+        <div style="font-family:'Courier Prime',monospace;font-size:10px;color:var(--taupe);margin-top:4px">${m.fmt(m.keyB)} (${periodLabel(periodB)})</div>
+      </div>`;
+    }).join('')}</div>`;
+  logAction('Sammenligning kjørt: '+periodA+' vs '+periodB);
+}
+
+// ----- AI CHAT -----
+async function sendChat(){
+  const input=document.getElementById('chat-input');
+  const msg=input.value.trim();
+  if(!msg) return;
+  input.value='';
+  addChatMsg('user',msg);
+  chatHistory.push({role:'user',content:msg});
+  const url=getWorker();
+  if(!url){
+    addChatMsg('ai','Worker URL er ikke satt. I demo-modus kan jeg svare basert på demo-dataene: '+getDemoAnswer(msg));
+    return;
+  }
+  const loadEl=addChatMsg('ai','<span class="spinner"></span> Tenker...');
+  try{
+    const summary=getDataSummary();
+    const result=await wPost('/ai',{
+      system:'Du er Google Ads-ekspert for Novooi, norsk premium møbel- og interiørnettbutikk. Svar alltid kort og konkret på norsk. Her er kampanjedataene: '+JSON.stringify(summary),
+      messages:chatHistory
+    });
+    loadEl.innerHTML=result.text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+    chatHistory.push({role:'assistant',content:result.text});
+    logAction('AI-chat: "'+msg.slice(0,40)+(msg.length>40?'...':'')+'"');
+  }catch(e){
+    loadEl.innerHTML='Feil: '+e.message;
+  }
+}
+
+function getDemoAnswer(msg){
+  const m=msg.toLowerCase();
+  if(m.includes('ctr')) return 'Gjennomsnitts CTR er 3,3%. Beste kampanje er "Søk — Sofaer og stolar" med 4,03% — over bransjesnittet på 2,8%.';
+  if(m.includes('kost')||m.includes('forbruk')||m.includes('budsjett')) return 'Totalt forbruk er kr 39 650. PMax bruker mest (56% av budsjettet) og leverer 55% av konverteringene.';
+  if(m.includes('søkeord')) return '"Premium interiør norge" har høyest CTR (5,86%) og QS 9. "Billige sofaer" bør legges til som negativt søkeord — lav QS og feil målgruppe.';
+  return 'Basert på demo-dataene ser kampanjene generelt bra ut. Koble til Worker URL for å analysere ekte data.';
+}
+
+function addChatMsg(role,html){
+  const msgs=document.getElementById('chat-messages');
+  const div=document.createElement('div');
+  div.className='chat-msg '+role;
+  div.innerHTML=html;
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+  return div;
+}
+
+function getDataSummary(){
+  return {
+    campaigns:D.campaigns.map(c=>({name:c.name,status:c.status,clicks:c.clicks,ctr:c.ctr,cost:c.costMicros/1e6,conversions:c.conversions})),
+    topKeywords:D.keywords.slice(0,15).map(k=>({keyword:k.keyword,matchType:k.matchType,ctr:k.ctr,cost:k.costMicros/1e6,conversions:k.conversions,qs:k.qs}))
+  };
+}
+
+// ----- KEYWORD SUGGESTIONS -----
+async function suggestKeywords(){
+  const btn=document.getElementById('kw-suggest-btn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Genererer...';
+  const status=document.getElementById('kw-suggest-status');
+  const url=getWorker();
+  if(!url){
+    document.getElementById('kw-suggest-result').innerHTML=getDemoKeywords();
+    btn.disabled=false; btn.textContent='Generer søkeordforslag';
+    return;
+  }
+  status.className='status on'; status.textContent='Sender til Claude...';
+  try{
+    const existing=D.keywords.map(k=>k.keyword).join(', ');
+    const result=await wPost('/ai',{
+      system:'Du er Google Ads-ekspert for Novooi, norsk premium møbel- og interiørnettbutikk med 100+ norske designere. Svar kun med en liste over søkeordforslag, formatert som en nummerert liste med søkeordet og en kort forklaring på norsk.',
+      messages:[{role:'user',content:`Basert på disse eksisterende søkeordene: ${existing}\n\nForeslå 15 nye relevante søkeord for å øke salget av premium møbler og interiør i Norge. Fokuser på kjøperintent, produktspesifikke termer og Skandinavisk design.`}]
+    });
+    document.getElementById('kw-suggest-result').innerHTML='<div style="font-size:15px;line-height:1.8;font-weight:300">'+result.text.replace(/\n/g,'<br>')+'</div>';
+    status.className='status on ok'; status.textContent='Forslag generert';
+    logAction('Søkeordforslag generert');
+  }catch(e){
+    status.className='status on err'; status.textContent='Feil: '+e.message;
+  }finally{
+    btn.disabled=false; btn.textContent='Generer søkeordforslag';
+  }
+}
+
+function getDemoKeywords(){
+  const suggestions=['designer sofa norge — kjøperintent, høy relevans','premium skinnsofaer oslo — geografisk + produkt','norsk designsofaer nettbutikk — transaksjonelt','skandinavisk interiør nettbutikk — merkevaresøk','bolia alternativer — konkurrentsøk','ekornes stressless priser — merkevare + pris','norgesdesign møbler — merkevaresøk','luksus soverom interiør — premium segment','norsk håndlaget møbel — differensiator','design spisestue pakke — pakkekjøp intent'];
+  return '<div style="font-size:15px;line-height:2;font-weight:300">'+suggestions.map((s,i)=>`<div><strong>${i+1}.</strong> ${s}</div>`).join('')+'</div>';
+}
+
+// ----- AD COPY GENERATOR -----
+async function generateAdCopy(){
+  const btn=document.getElementById('adcopy-btn');
+  const cat=document.getElementById('adcopy-cat').value;
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Genererer...';
+  const status=document.getElementById('adcopy-status');
+  const url=getWorker();
+  if(!url){
+    document.getElementById('adcopy-result').innerHTML=getDemoAdCopy(cat);
+    btn.disabled=false; btn.textContent='Generer annonsekopi';
+    return;
+  }
+  status.className='status on'; status.textContent='Genererer annonsekopi...';
+  try{
+    const result=await wPost('/ai',{
+      system:'Du er Google Ads copywriter for Novooi, norsk premium møbel- og interiørnettbutikk. Skriv RSA-varianter på norsk. Overskrifter: max 30 tegn. Descriptions: max 90 tegn. Fokus på premium kvalitet, norsk design og differensiering fra lavpriskonkurrenter.',
+      messages:[{role:'user',content:`Generer 5 RSA-annonser for kategorien "${cat}" for Novooi.com. For hver annonse: 3 overskrifter (max 30 tegn) og 2 descriptions (max 90 tegn). Formater tydelig med Annonse 1, Annonse 2 osv.`}]
+    });
+    document.getElementById('adcopy-result').innerHTML='<div style="font-size:15px;line-height:1.8;font-weight:300;white-space:pre-wrap">'+result.text+'</div>';
+    status.className='status on ok'; status.textContent='Annonsekopi generert';
+    logAction('Annonsekopi generert: '+cat);
+  }catch(e){
+    status.className='status on err'; status.textContent='Feil: '+e.message;
+  }finally{
+    btn.disabled=false; btn.textContent='Generer annonsekopi';
+  }
+}
+
+function getDemoAdCopy(cat){
+  return `<div style="font-size:15px;line-height:2;font-weight:300">
+  <strong>Annonse 1 — ${cat}</strong><br>
+  Overskrifter: "Norsk Design ${cat}" | "Premium Kvalitet | Novooi" | "Gratis Frakt Over kr 3000"<br>
+  Descriptions: "Opplev 100+ norske designere samlet på ett sted. Håndplukkede møbler med livsgaranti." | "Fri retur i 30 dager. Norges største utvalg av premium interiør og møbler."<br><br>
+  <strong>Annonse 2 — ${cat}</strong><br>
+  Overskrifter: "Kjøp ${cat} på Nett" | "Skandinavisk Design" | "Rask Levering Norge"<br>
+  Descriptions: "Fra klassikere til moderne design — finn ditt perfekte møbel blant 1000+ produkter." | "Norske merkevarer og designere. Ekspertservice og personlig veiledning."
+  </div>`;
+}
+
+// ----- TAB ANALYSIS -----
+const TAB_PROMPTS = {
+  campaigns: {
+    system: `Du er en senior Google Ads-strateg for Novooi, en norsk premium nettbutikk for møbler og interiør (novooi.com) som aggregerer 100+ norske designere. Du har dyp forståelse av det norske møbelmarkedet, Skandinavisk designkultur og premium e-commerce.
+
+Din oppgave er å analysere kampanjene og gi to typer tilbakemeldinger:
+
+**DEL 1 — FORBEDRINGER:** Konkrete, spesifikke tiltak for å forbedre eksisterende kampanjer. Beskriv nøyaktig HVA som bør endres og HVORFOR.
+
+**DEL 2 — STRATEGISKE ALTERNATIVER:** For kampanjer som ikke leverer godt nok — ikke bare forbedringer, men radikalt annerledes tilnærminger. Tenk: Burde vi strukturere dette helt annerledes? Burde vi slå kampanjer sammen? Splitte dem opp? Bytte kampanjetype? Målrette mot et annet publikum? Gi modige forslag selv om de innebærer store endringer.
+
+Formater svaret slik:
+## Forbedringer
+[For hver kampanje som kan forbedres: **[Kampanjenavn]** — konkret tiltak]
+
+## Strategiske alternativer
+[For underytende kampanjer: **[Kampanjenavn]** — alternativ strategi med begrunnelse]
+
+Vær direkte, konkret og bruk norsk. Unngå generiske råd.`,
+    userMsg: (d) => `Her er kampanjdataene fra Novooi (siste 30 dager):\n\n${JSON.stringify(d.campaigns.map(c=>({navn:c.name,status:c.status,type:c.type,visninger:c.impressions,klikk:c.clicks,ctr:(c.ctr*100).toFixed(2)+'%',forbruk_kr:(c.costMicros/1e6).toFixed(0),konverteringer:c.conversions.toFixed(1),konvRate:(c.conversionRate*100).toFixed(2)+'%',cpc_kr:(c.avgCpc/1e6).toFixed(2)})),null,2)}\n\nBransjesnitt for norske møbler: CTR search 2,8%, conv rate 1,8%, CPA kr 890. Gi konkrete forbedringer OG strategiske alternativer.`
+  },
+  keywords: {
+    system: `Du er en senior Google Ads-søkeordstrateg for Novooi, en norsk premium møbel- og interiørnettbutikk. Du forstår søkeintensjoner i det norske markedet, kjøpsreisen for premium møbler, og hvordan søkeordstruktur påvirker Quality Score og CPA.
+
+Din oppgave er å analysere søkeordene og gi to typer tilbakemeldinger:
+
+**DEL 1 — FORBEDRINGER:** Spesifikke forbedringer for hvert søkeord. Match type-endringer, budendringer, Quality Score-tiltak, negative søkeord som bør legges til.
+
+**DEL 2 — STRATEGISKE ALTERNATIVER:** For søkeord som ikke fungerer — ikke bare justeringer, men fundamentalt annerledes tilnærming. Burde vi dele opp i separate annonsegrupper? Endre match type helt? Erstatte med relaterte søkeord? Legge til kjøperintent-modifikatorer? Er det hele søkeordkategorier vi mangler?
+
+Formater svaret slik:
+## Forbedringer
+[For hvert søkeord med potensial: **[søkeord]** — konkret tiltak]
+
+## Strategiske alternativer  
+[For søkeord som ikke fungerer: **[søkeord]** — alternativ tilnærming]
+
+## Søkeord vi mangler
+[3-5 søkeordkategorier vi burde teste basert på dataene]
+
+Vær direkte, konkret og bruk norsk.`,
+    userMsg: (d) => `Her er søkeorddata fra Novooi (siste 30 dager):\n\n${JSON.stringify(d.keywords.map(k=>({søkeord:k.keyword,match:k.matchType,kampanje:k.campaign,visninger:k.impressions,klikk:k.clicks,ctr:(k.ctr*100).toFixed(2)+'%',forbruk_kr:(k.costMicros/1e6).toFixed(0),konverteringer:k.conversions.toFixed(1),qs:k.qs})),null,2)}\n\nGi konkrete forbedringer OG strategiske alternativer for hvert søkeord som ikke leverer. Bransjenorm QS: 7+, CTR: 2,8%+.`
+  },
+  ads: {
+    system: `Du er en senior Google Ads copywriter og annonse-strateg for Novooi, en norsk premium møbel- og interiørnettbutikk med 100+ norske designere. Du forstår hva som konverterer i det norske premium-segmentet: kvalitetssignaler, norsk opprinnelse, design-identitet, og tydelig differensiering fra lavprisaktører som IKEA og Jysk.
+
+Din oppgave er å analysere annonsene og gi to typer tilbakemeldinger:
+
+**DEL 1 — FORBEDRINGER:** Konkrete endringer i eksisterende annonsekopi. Nye headlines å teste, svake descriptions å erstatte, manglende USP-er å legge inn.
+
+**DEL 2 — STRATEGISKE ALTERNATIVER:** For annonser med lav CTR eller konvertering — ikke bare justeringer, men en helt annen kreativ strategi. Burde vi teste en annen vinkel (f.eks. emosjonell vs. rasjonell)? Andre USP-er? Andre calls-to-action? Burde annonsene segmenteres per produktkategori i stedet for generelt?
+
+Formater svaret slik:
+## Forbedringer
+[For hver annonse: **[annonsenavn/headline]** — konkret tekst å teste]
+
+## Strategiske alternativer
+[For underytende annonser: **[annonsenavn]** — ny kreativ retning med eksempel-headlines]
+
+## Generelle observasjoner
+[2-3 mønstre du ser på tvers av alle annonsene]
+
+Vær direkte og gi faktiske eksempler på tekst, ikke bare generiske råd. Skriv på norsk.`,
+    userMsg: (d) => `Her er annonsedata fra Novooi (siste 30 dager):\n\n${JSON.stringify(d.ads.map(a=>({headline:a.headline,kampanje:a.campaign,status:a.status,visninger:a.impressions,klikk:a.clicks,ctr:(a.ctr*100).toFixed(2)+'%',konverteringer:a.conversions.toFixed(1)})),null,2)}\n\nGi konkrete forbedringer og strategiske alternativer. Bransjenorm CTR: 2,8%+. For Novooi er nøkkel-USP-er: norsk design, 100+ merkevarer, premium kvalitet, norske designere.`
+  }
+};
+
+async function runTabAnalysis(type){
+  const ids = {campaigns:{btn:'camp-analyse-btn',status:'camp-analysis-status',result:'camp-analysis-result'},keywords:{btn:'kw-analyse-btn',status:'kw-analysis-status',result:'kw-analysis-result'},ads:{btn:'ads-analyse-btn',status:'ads-analysis-status',result:'ads-analysis-result'}};
+  const id = ids[type];
+  const btn = document.getElementById(id.btn);
+  const statusEl = document.getElementById(id.status);
+  const resultEl = document.getElementById(id.result);
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Analyserer...';
-  showAiStatus('Sender data til Claude...', '');
-
-  try {
-    const summary = {
-      campaigns: adsData.campaigns.map(c => ({
-        name: c.campaign?.name, status: c.campaign?.status, type: c.campaign?.advertisingChannelType,
-        impressions: c.metrics?.impressions, clicks: c.metrics?.clicks, ctr: c.metrics?.ctr,
-        costMicros: c.metrics?.costMicros, conversions: c.metrics?.conversions
-      })),
-      topKeywords: adsData.keywords.slice(0,30).map(k => ({
-        keyword: k.adGroupCriterion?.keyword?.text, matchType: k.adGroupCriterion?.keyword?.matchType,
-        campaign: k.campaign?.name, impressions: k.metrics?.impressions, clicks: k.metrics?.clicks,
-        ctr: k.metrics?.ctr, costMicros: k.metrics?.costMicros, conversions: k.metrics?.conversions,
-        qualityScore: k.metrics?.qualityScore
-      })),
-      topAds: adsData.ads.slice(0,10).map(a => ({
-        headlines: a.adGroupAd?.ad?.responsiveSearchAd?.headlines?.map(h=>h.text),
-        descriptions: a.adGroupAd?.ad?.responsiveSearchAd?.descriptions?.map(d=>d.text),
-        campaign: a.campaign?.name, impressions: a.metrics?.impressions,
-        clicks: a.metrics?.clicks, ctr: a.metrics?.ctr, conversions: a.metrics?.conversions
-      }))
-    };
-
-    const result = await workerFetch('/analyse', { data: summary });
-
-    document.getElementById('ai-output').classList.add('visible');
-    document.getElementById('ai-content').innerHTML = result.text
-      .split('\n\n')
-      .map(block => {
-        if (block.startsWith('### ') || block.startsWith('## ')) return '<h3>' + block.replace(/^#+\s/, '') + '</h3>';
-        if (block.includes('\n- ') || block.startsWith('- ')) {
-          return '<ul>' + block.split('\n').filter(l=>l.trim()).map(l=>'<li>'+l.replace(/^[-*]\s/,'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')+'</li>').join('') + '</ul>';
-        }
-        return '<p>' + block.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>') + '</p>';
-      }).join('');
-
-    showAiStatus('Analyse fullført', 'success');
-    document.getElementById('ai-output').scrollIntoView({ behavior: 'smooth' });
-
-  } catch (err) {
-    showAiStatus('Feil: ' + err.message, 'error');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Kjør ny analyse';
+  statusEl.className = 'status on';
+  statusEl.textContent = 'Claude leser gjennom dataene...';
+  resultEl.innerHTML = '';
+  const url = getWorker();
+  if(!url){
+    await new Promise(r=>setTimeout(r,900));
+    resultEl.innerHTML = getDemoAnalysis(type);
+    statusEl.className = 'status on ok';
+    statusEl.textContent = 'Demo-analyse fullført';
+    btn.disabled = false; btn.textContent = 'Analyser på nytt';
+    logAction('Demo-analyse kjørt: '+type);
+    return;
   }
+  try {
+    const prompt = TAB_PROMPTS[type];
+    const result = await wPost('/ai', {
+      system: prompt.system,
+      messages: [{ role: 'user', content: prompt.userMsg(D) }]
+    });
+    resultEl.innerHTML = renderAnalysisMarkdown(result.text);
+    statusEl.className = 'status on ok';
+    statusEl.textContent = 'Analyse fullført';
+    logAction('AI-analyse kjørt: '+type);
+  } catch(e) {
+    statusEl.className = 'status on err';
+    statusEl.textContent = 'Feil: ' + e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Analyser på nytt';
+  }
+}
+
+function renderAnalysisMarkdown(text){
+  const sections = text.split(/\n## /);
+  return sections.map((sec,i) => {
+    if(!sec.trim()) return '';
+    const lines = sec.split('\n');
+    const title = lines[0].replace(/^#+\s*/,'').trim();
+    const body = lines.slice(1).join('\n').trim();
+    const isStrategic = title.toLowerCase().includes('strategisk') || title.toLowerCase().includes('alternativ') || title.toLowerCase().includes('mangler');
+    const labelClass = isStrategic ? 'strategic' : 'improve';
+    const labelText = isStrategic ? (title.toLowerCase().includes('mangler') ? 'Mangler' : 'Strategiske alternativer') : 'Forbedringer';
+    const items = body.split(/\n(?=\*\*|[-–])/).filter(s=>s.trim());
+    const itemsHtml = items.map(item => {
+      const hasBold = item.match(/^\*\*(.*?)\*\*/);
+      const itemClass = isStrategic ? 'strategic' : (item.toLowerCase().includes('pause') || item.toLowerCase().includes('kutt') || item.toLowerCase().includes('kritis') ? 'critical' : 'improve');
+      if(hasBold){
+        const titleText = hasBold[1];
+        const rest = item.replace(/^\*\*(.*?)\*\*\s*[—-]?\s*/,'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+        return `<div class="analysis-item ${itemClass}"><div class="analysis-item-title">${titleText}</div><div class="analysis-item-body">${rest}</div></div>`;
+      }
+      return `<div class="analysis-item ${itemClass}"><div class="analysis-item-body">${item.replace(/^[-–]\s*/,'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
+    }).join('');
+    return `<div class="analysis-section"><span class="analysis-label ${labelClass}">${i===0?title:labelText}</span>${itemsHtml}</div>`;
+  }).join('');
+}
+
+function getDemoAnalysis(type){
+  const demo = {
+    campaigns: `<div class="analysis-section">
+      <span class="analysis-label improve">Forbedringer</span>
+      <div class="analysis-item improve"><div class="analysis-item-title">PMax — Møbler generelt</div><div class="analysis-item-body">Del opp i separate asset groups per kategori (sofaer, bord, soverom). PMax-kampanjer med én bred asset group mister relevans — hver gruppe bør ha egne bilder, overskrifter og landingssider som matcher kategorien. CTR vil øke og CPA vil synke.</div></div>
+      <div class="analysis-item improve"><div class="analysis-item-title">Display — Remarketing</div><div class="analysis-item-body">CTR på 0,25% er under bransjenorm. Bytt til <strong>Custom Audience</strong> basert på produktsider besøkt siste 14 dager i stedet for generell remarketing. Segmenter på produktkategori slik at folk som så på sofaer får sofa-annonser.</div></div>
+      <div class="analysis-item improve"><div class="analysis-item-title">Søk — Belysning (pauset)</div><div class="analysis-item-body">Reaktiver med et begrenset testbudsjett (kr 50/dag) i mars–april. Belysning er et sterkt impulskjøp om våren og kan drive mersalg til eksisterende møbelkunder.</div></div>
+    </div>
+    <div class="analysis-section">
+      <span class="analysis-label strategic">Strategiske alternativer</span>
+      <div class="analysis-item strategic"><div class="analysis-item-title">Display — Remarketing → Bytt til YouTube</div><div class="analysis-item-body">Display-kampanjen bruker kr 1 800 og gir kun 1,4 konverteringer (CPA kr 1 286). Vurder å <strong>erstatte den helt med YouTube In-Stream</strong>: En 15-sekunders video av Novoois sortiment mot en Custom Audience av nettstedbesøkere vil bygge merkevare og konvertere bedre i premium-segmentet der visuelle formater har høyere gjennomslag.</div></div>
+      <div class="analysis-item strategic"><div class="analysis-item-title">Søk — Sofaer og Bord → Slå sammen eller splitt hardere</div><div class="analysis-item-body">To alternativer: (A) <strong>Slå alle søkekampanjer til én</strong> med sterke annonsegrupper per kategori — gir mer data til Smart Bidding. Eller (B) <strong>Splitt mye hardere</strong>: separat kampanje per prisnivå (under kr 10k / over kr 10k) slik at budene kan settes etter kjøpsintensjon og margin.</div></div>
+      <div class="analysis-item critical"><div class="analysis-item-title">PMax — Vurder å sette søkeordutslukninger</div><div class="analysis-item-body">PMax kanibalisererer sannsynligvis trafikk fra Søk-kampanjene dine. Legg til <strong>brand-eksklusjoner og kjernesøkeord som negative</strong> på PMax, slik at Søk-kampanjene får ta de høyest-intenderte søkene. Dette er en ofte oversett innstilling som kan redusere samlet CPA med 15–25%.</div></div>
+    </div>`,
+    keywords: `<div class="analysis-section">
+      <span class="analysis-label improve">Forbedringer</span>
+      <div class="analysis-item improve"><div class="analysis-item-title">kjøp sofa nettbutikk (QS 6, BROAD)</div><div class="analysis-item-body">Bytt til <strong>PHRASE match</strong> og legg til søkeordet i annonseoverskriften. "Kjøp" signaliserer kjøpsintensjon — disse klikkene er verdifulle men BROAD sløser budsjett på irrelevante varianter. Forventet QS-økning: 6 → 8.</div></div>
+      <div class="analysis-item improve"><div class="analysis-item-title">premium interiør norge (QS 9, EXACT)</div><div class="analysis-item-body">Dette er ditt beste søkeord med 5,86% CTR. <strong>Øk budet med 40%</strong> og vurder å lage en dedikert landingsside som fremhever de norske designerne spesifikt. Potensialet er ikke fullt utnyttet.</div></div>
+      <div class="analysis-item critical"><div class="analysis-item-title">billige sofaer (QS 3, BROAD)</div><div class="analysis-item-body"><strong>Pause umiddelbart.</strong> QS 3, 0,2 konverteringer på kr 980 forbruk. "Billig" er feil målgruppe for Novooi — dette søkeordet skader QS på annonsegruppen og driver irrelevant trafikk. Legg til "billig", "billige", "rimelig" som negative på tvers av alle kampanjer.</div></div>
+    </div>
+    <div class="analysis-section">
+      <span class="analysis-label strategic">Strategiske alternativer</span>
+      <div class="analysis-item strategic"><div class="analysis-item-title">Norske merkevaresøk mangler helt</div><div class="analysis-item-body">Dataene viser ingen søkeord på spesifikke norske merkevarer (Ekornes, Hov Dokka, Brunstad, Slettvoll). <strong>Opprett en dedikert merkevare-kampanje</strong> med exact match på disse. Folk som søker på merkevarer er langt lenger i kjøpsreisen og konverterer vesentlig bedre enn generiske søk.</div></div>
+      <div class="analysis-item strategic"><div class="analysis-item-title">møbler på nett (QS 5, BROAD) → Del i kjøperintent-grupper</div><div class="analysis-item-body">I stedet for ett bredt søkeord, bygg tre separate grupper: <strong>(1)</strong> "kjøpe møbler på nett" (transaksjonsintensjon), <strong>(2)</strong> "norske møbler nettbutikk" (merkevareutforsking), <strong>(3)</strong> "inspirasjon møbler" (tidlig fase). Hvert segment fortjener ulik annonsekopi og budstrategi.</div></div>
+    </div>
+    <div class="analysis-section">
+      <span class="analysis-label strategic">Søkeord vi mangler</span>
+      <div class="analysis-item strategic"><div class="analysis-item-body"><strong>Norske designer-merker:</strong> Ekornes, Hov Dokka, Brunstad, Slettvoll, Dentti<br><strong>Roms-spesifikke:</strong> "møbler til stue", "soverom innredning", "kontormøbler hjemmekontor"<br><strong>Stil-søk:</strong> "japandi interiør", "wabi-sabi møbler", "minimalistisk stue innredning"<br><strong>Gavekjøp:</strong> "gave til nytt hjem", "bryllupsgave møbler"</div></div>
+    </div>`,
+    ads: `<div class="analysis-section">
+      <span class="analysis-label improve">Forbedringer</span>
+      <div class="analysis-item improve"><div class="analysis-item-title">Norsk Design Sofa | Novooi (CTR 4,24%)</div><div class="analysis-item-body">Dette er din beste annonse — <strong>legg til prisankring</strong> for å øke CTR ytterligere: Test "Norsk Design Sofa | Fra kr 4 990" og "Håndlaget i Norge | Se 200+ Modeller". Høy CTR betyr at meldingen resonerer — optimaliser videre fremfor å endre grunnleggende.</div></div>
+      <div class="analysis-item improve"><div class="analysis-item-title">Designmøbler fra 100+ Merkevarer (CTR 2,21%)</div><div class="analysis-item-body">Under bransjenorm. Problemet er at "100+ merkevarer" er abstrakt. <strong>Gjør det konkret:</strong> "Ekornes, Brunstad, Slettvoll — Alt på Novooi" eller "Norges Største Utvalg av Premium Møbler". Navngi faktiske merkevarer kunden kjenner igjen.</div></div>
+      <div class="analysis-item improve"><div class="analysis-item-title">Norske Møbler | Gratis Frakt Over 3000 (CTR 2,33%)</div><div class="analysis-item-body">"Gratis frakt over 3000" er et svakt insentiv for en premium nettbutikk der kunden typisk bruker kr 15 000+. <strong>Bytt til:</strong> "Gratis montering i Oslo og Viken" eller "30 dagers bytterett — Ingen risiko".</div></div>
+    </div>
+    <div class="analysis-section">
+      <span class="analysis-label strategic">Strategiske alternativer</span>
+      <div class="analysis-item strategic"><div class="analysis-item-title">Alle annonser → Emosjonell vs. rasjonell split-test</div><div class="analysis-item-body">Alle nåværende annonser er <strong>rasjonelle</strong> (pris, utvalg, frakt). Test en <strong>emosjonell variant</strong> som appellerer til identitet og livsstil: "Hjemmet ditt forteller hvem du er", "Norsk håndverk — varer i generasjoner", "Design som stopper deg i døren". Premium-kunder kjøper ofte på følelse, ikke logikk.</div></div>
+      <div class="analysis-item strategic"><div class="analysis-item-title">Generelle annonser → Kategori-spesifikke annonser</div><div class="analysis-item-body">I stedet for generiske annonser for hele Novooi, <strong>bytt til strikt kategoribasert</strong> annonsering: Sofaannonser vises kun til sofa-søk, med sofa-spesifikke USP-er og direkte lenke til sofakategorien. Dette øker relevans, QS og conv rate betydelig. Krever mer oppsett men er standarden for vinnende e-commerce-struktur.</div></div>
+      <div class="analysis-item strategic"><div class="analysis-item-title">Norsk Interiør på Nett (CTR 3,04%) → Test konkurrentposisjonering</div><div class="analysis-item-body">En uutprøvd strategi: <strong>Direkte sammenligningsannonser</strong> mot IKEA. "Alt IKEA ikke har — Norsk Design på Novooi" eller "Hev standarden fra IKEA til norsk håndverk". Høy risiko men høy belønning — fanger folk midt i beslutningsprosessen.</div></div>
+    </div>
+    <div class="analysis-section">
+      <span class="analysis-label strategic">Generelle observasjoner</span>
+      <div class="analysis-item"><div class="analysis-item-body"><strong>Mangel på sosiale bevis:</strong> Ingen av annonsene nevner kundevurderinger, antall kunder eller tillitssignaler. Test "Over 10 000 fornøyde kunder" eller "4,8/5 stjerner".<br><br><strong>Ingen urgency:</strong> Premium-kunder er ikke prisfokusert, men de reagerer på eksklusivitet: "Begrenset opplag", "Siste exemplar", "Forhåndsbestill til vår 2025".<br><br><strong>Landingssider er trolig flaskehalsen:</strong> Med CTR på 2-4% men conv rate på kun 1,5-2,4% er det mer å hente på landingssidene enn i annonsekopien.</div></div>
+    </div>`
+  };
+  return demo[type] || '<p>Ingen demo-analyse tilgjengelig.</p>';
+}
+
+let actLog=[];
+function logAction(msg){
+  const now=new Date().toLocaleTimeString('nb-NO');
+  actLog.unshift({time:now,msg});
+  if(actLog.length>50) actLog.pop();
+  renderLog();
+}
+function renderLog(){
+  const el=document.getElementById('log-content');
+  if(!el) return;
+  if(!actLog.length){el.innerHTML='<div class="log-empty">Ingen aktivitet ennå.</div>';return;}
+  el.innerHTML=actLog.map(e=>`<div class="log-entry"><span class="log-time">${e.time}</span><span>${e.msg}</span></div>`).join('');
+}
+function clearLog(){actLog=[];renderLog();}
+
+// ----- STATUS TOAST -----
+function showMain(type,msg){
+  const el=document.getElementById('main-status');
+  el.textContent=msg;
+  el.className='status on '+(type==='err'?'err':type==='ok'?'ok':'');
+  clearTimeout(window._stTimeout);
+  window._stTimeout=setTimeout(()=>el.className='status',4000);
 }
 </script>
 </body>
