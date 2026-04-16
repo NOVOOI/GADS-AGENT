@@ -27,7 +27,6 @@
     color: var(--ink);
     font-family: 'Cormorant Garamond', Georgia, serif;
     min-height: 100vh;
-    padding: 0;
   }
 
   /* Password gate */
@@ -40,285 +39,135 @@
     z-index: 1000;
   }
   #gate.hidden { display: none; }
-  .gate-box {
-    text-align: center;
-    width: 320px;
-  }
+  .gate-box { text-align: center; width: 320px; }
   .gate-logo {
-    font-size: 28px;
-    font-weight: 300;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--cream);
-    margin-bottom: 8px;
+    font-size: 28px; font-weight: 300;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--cream); margin-bottom: 8px;
   }
   .gate-sub {
-    font-family: 'Courier Prime', monospace;
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    color: var(--taupe);
-    text-transform: uppercase;
-    margin-bottom: 40px;
+    font-family: 'Courier Prime', monospace; font-size: 10px;
+    letter-spacing: 0.15em; color: var(--taupe);
+    text-transform: uppercase; margin-bottom: 40px;
   }
   .gate-box input {
-    width: 100%;
-    background: rgba(255,255,255,0.06);
+    width: 100%; background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.15);
-    padding: 14px 18px;
-    font-family: 'Courier Prime', monospace;
-    font-size: 14px;
-    color: var(--cream);
-    text-align: center;
-    letter-spacing: 0.1em;
-    outline: none;
-    margin-bottom: 12px;
+    padding: 14px 18px; font-family: 'Courier Prime', monospace;
+    font-size: 14px; color: var(--cream); text-align: center;
+    letter-spacing: 0.1em; outline: none; margin-bottom: 12px;
   }
   .gate-box input::placeholder { color: var(--taupe); }
   .gate-box input:focus { border-color: var(--taupe); }
   .gate-btn {
-    width: 100%;
-    padding: 14px;
-    background: var(--accent);
-    color: var(--cream);
-    font-family: 'Courier Prime', monospace;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    border: none;
-    cursor: pointer;
-    transition: background 0.2s;
+    width: 100%; padding: 14px; background: var(--accent);
+    color: var(--cream); font-family: 'Courier Prime', monospace;
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    border: none; cursor: pointer; transition: background 0.2s;
   }
   .gate-btn:hover { background: var(--brown); }
   .gate-error {
-    font-family: 'Courier Prime', monospace;
-    font-size: 11px;
-    color: #e07060;
-    margin-top: 10px;
-    min-height: 16px;
+    font-family: 'Courier Prime', monospace; font-size: 11px;
+    color: #e07060; margin-top: 10px; min-height: 16px;
   }
 
   header {
-    background: var(--dark);
-    color: var(--cream);
-    padding: 20px 40px;
-    display: flex;
-    align-items: baseline;
-    gap: 16px;
-    border-bottom: 2px solid var(--accent);
+    background: var(--dark); color: var(--cream);
+    padding: 20px 40px; display: flex; align-items: baseline;
+    gap: 16px; border-bottom: 2px solid var(--accent);
+  }
+  header h1 { font-size: 22px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; }
+  header span { font-family: 'Courier Prime', monospace; font-size: 11px; color: var(--taupe); letter-spacing: 0.08em; }
+
+  .worker-bar {
+    background: var(--sand); border-bottom: 1px solid var(--border);
+    padding: 10px 40px; display: flex; align-items: center; gap: 12px;
+  }
+  .worker-bar label {
+    font-family: 'Courier Prime', monospace; font-size: 10px;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--brown);
+    white-space: nowrap;
+  }
+  .worker-bar input {
+    flex: 1; background: var(--warm-white); border: 1px solid var(--border);
+    padding: 7px 12px; font-family: 'Courier Prime', monospace;
+    font-size: 12px; color: var(--ink); outline: none;
+  }
+  .worker-bar input:focus { border-color: var(--brown); }
+  #worker-status {
+    font-family: 'Courier Prime', monospace; font-size: 10px;
+    color: var(--taupe); white-space: nowrap;
   }
 
-  header h1 {
-    font-size: 22px;
-    font-weight: 300;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  header span {
-    font-family: 'Courier Prime', monospace;
-    font-size: 11px;
-    color: var(--taupe);
-    letter-spacing: 0.08em;
-  }
-
-  .container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 40px 32px;
-  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px; }
 
   .section {
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    padding: 28px 32px;
-    margin-bottom: 24px;
+    background: var(--warm-white); border: 1px solid var(--border);
+    padding: 28px 32px; margin-bottom: 24px;
   }
-
   .section-title {
-    font-size: 11px;
-    font-family: 'Courier Prime', monospace;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--brown);
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border);
+    font-size: 11px; font-family: 'Courier Prime', monospace;
+    letter-spacing: 0.15em; text-transform: uppercase; color: var(--brown);
+    margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
   }
-
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-
-  label {
-    display: block;
-    font-family: 'Courier Prime', monospace;
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--brown);
-    margin-bottom: 6px;
-  }
-
-  input[type="text"], input[type="password"], select {
-    width: 100%;
-    background: var(--cream);
-    border: 1px solid var(--border);
-    padding: 10px 14px;
-    font-family: 'Courier Prime', monospace;
-    font-size: 12px;
-    color: var(--ink);
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  input:focus { border-color: var(--brown); }
 
   .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 28px;
-    font-family: 'Courier Prime', monospace;
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 28px; font-family: 'Courier Prime', monospace;
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    cursor: pointer; border: none; transition: all 0.2s;
   }
-
-  .btn-primary {
-    background: var(--dark);
-    color: var(--cream);
-  }
+  .btn-primary { background: var(--dark); color: var(--cream); }
   .btn-primary:hover { background: var(--accent); }
   .btn-primary:disabled { background: var(--taupe); cursor: not-allowed; }
-
-  .btn-secondary {
-    background: transparent;
-    color: var(--ink);
-    border: 1px solid var(--border);
-  }
-  .btn-secondary:hover { border-color: var(--brown); }
-
   .btn-ai {
-    background: var(--accent);
-    color: var(--cream);
-    width: 100%;
-    justify-content: center;
-    padding: 16px;
-    font-size: 12px;
+    background: var(--accent); color: var(--cream);
+    width: 100%; justify-content: center; padding: 16px; font-size: 12px;
   }
   .btn-ai:hover { background: var(--dark); }
   .btn-ai:disabled { background: var(--taupe); cursor: not-allowed; }
 
   .status-bar {
-    font-family: 'Courier Prime', monospace;
-    font-size: 11px;
-    padding: 10px 14px;
-    background: var(--sand);
+    font-family: 'Courier Prime', monospace; font-size: 11px;
+    padding: 10px 14px; background: var(--sand);
     border-left: 3px solid var(--brown);
-    margin-top: 16px;
-    display: none;
+    margin-top: 16px; display: none;
   }
   .status-bar.visible { display: block; }
   .status-bar.error { border-left-color: var(--red); background: #fdf0ee; }
   .status-bar.success { border-left-color: var(--green); background: #f0fdf4; }
 
   .spinner {
-    display: inline-block;
-    width: 12px; height: 12px;
-    border: 2px solid var(--taupe);
-    border-top-color: var(--brown);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    display: inline-block; width: 12px; height: 12px;
+    border: 2px solid var(--taupe); border-top-color: var(--brown);
+    border-radius: 50%; animation: spin 0.8s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* Stats */
   .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
   .stat-card {
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    padding: 20px;
-    text-align: center;
+    background: var(--warm-white); border: 1px solid var(--border);
+    padding: 20px; text-align: center;
   }
-  .stat-value {
-    font-size: 32px;
-    font-weight: 300;
-    color: var(--dark);
-    display: block;
-    line-height: 1;
-    margin-bottom: 6px;
-  }
-  .stat-label {
-    font-family: 'Courier Prime', monospace;
-    font-size: 9px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--taupe);
-  }
+  .stat-value { font-size: 32px; font-weight: 300; color: var(--dark); display: block; line-height: 1; margin-bottom: 6px; }
+  .stat-label { font-family: 'Courier Prime', monospace; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--taupe); }
 
-  /* Table */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-  }
-  thead tr {
-    background: var(--dark);
-    color: var(--cream);
-  }
-  thead th {
-    padding: 10px 14px;
-    text-align: left;
-    font-family: 'Courier Prime', monospace;
-    font-size: 9px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    font-weight: 400;
-  }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  thead tr { background: var(--dark); color: var(--cream); }
+  thead th { padding: 10px 14px; text-align: left; font-family: 'Courier Prime', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 400; }
   tbody tr { border-bottom: 1px solid var(--border); }
   tbody tr:hover { background: var(--sand); }
   tbody td { padding: 10px 14px; }
   .mono { font-family: 'Courier Prime', monospace; font-size: 12px; }
 
-  .badge {
-    display: inline-block;
-    padding: 2px 8px;
-    font-family: 'Courier Prime', monospace;
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
+  .badge { display: inline-block; padding: 2px 8px; font-family: 'Courier Prime', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; }
   .badge-green { background: #e8f5ee; color: var(--green); border: 1px solid #b8dfc8; }
-  .badge-red { background: #fdf0ee; color: var(--red); border: 1px solid #f0c8c0; }
   .badge-gray { background: var(--sand); color: var(--brown); border: 1px solid var(--border); }
 
-  /* AI output */
-  #ai-output {
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    padding: 28px 32px;
-    margin-top: 24px;
-    display: none;
-  }
+  #ai-output { background: var(--warm-white); border: 1px solid var(--border); padding: 28px 32px; margin-top: 24px; display: none; }
   #ai-output.visible { display: block; }
-
-  .ai-content {
-    font-size: 17px;
-    line-height: 1.7;
-    font-weight: 300;
-  }
-  .ai-content h3 {
-    font-size: 13px;
-    font-family: 'Courier Prime', monospace;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--brown);
-    margin: 24px 0 10px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--border);
-  }
+  .ai-content { font-size: 17px; line-height: 1.7; font-weight: 300; }
+  .ai-content h3 { font-size: 13px; font-family: 'Courier Prime', monospace; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brown); margin: 24px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
   .ai-content p { margin-bottom: 14px; }
   .ai-content ul { padding-left: 20px; margin-bottom: 14px; }
   .ai-content li { margin-bottom: 6px; }
@@ -327,33 +176,8 @@
   #data-section { display: none; }
   #data-section.visible { display: block; }
 
-  .actions-row {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-
-  .tab-nav {
-    display: flex;
-    gap: 0;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 20px;
-  }
-  .tab-btn {
-    padding: 10px 20px;
-    font-family: 'Courier Prime', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    cursor: pointer;
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    color: var(--taupe);
-    transition: all 0.2s;
-    margin-bottom: -1px;
-  }
+  .tab-nav { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+  .tab-btn { padding: 10px 20px; font-family: 'Courier Prime', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; background: none; border: none; border-bottom: 2px solid transparent; color: var(--taupe); transition: all 0.2s; margin-bottom: -1px; }
   .tab-btn.active { color: var(--dark); border-bottom-color: var(--dark); }
   .tab-pane { display: none; }
   .tab-pane.active { display: block; }
@@ -377,66 +201,36 @@
   <span>Google Ads Analyse</span>
 </header>
 
+<!-- Worker URL bar -->
+<div class="worker-bar">
+  <label>Worker URL</label>
+  <input type="text" id="worker-url" placeholder="https://novooi-ads.din-subdomain.workers.dev" oninput="saveWorkerUrl()">
+  <span id="worker-status">ikke satt</span>
+</div>
+
 <div class="container">
 
-  <!-- Credentials -->
   <div class="section">
-    <div class="section-title">API-nøkler <span style="font-size:9px;color:var(--taupe);margin-left:8px">— lagres i nettleseren denne økten, ikke i koden</span></div>
-    <div class="grid-2" style="margin-bottom:16px">
-      <div>
-        <label>Developer Token</label>
-        <input type="password" id="dev-token" placeholder="Lim inn developer token">
-      </div>
-      <div>
-        <label>Customer ID</label>
-        <input type="text" id="customer-id" placeholder="uten bindestreker, f.eks. 6307637547">
-      </div>
-    </div>
-    <div class="grid-2" style="margin-bottom:16px">
-      <div>
-        <label>Client ID</label>
-        <input type="text" id="client-id" placeholder="...apps.googleusercontent.com">
-      </div>
-      <div>
-        <label>Client Secret</label>
-        <input type="password" id="client-secret" placeholder="GOCSPX-...">
-      </div>
-    </div>
-    <div style="margin-bottom:16px">
-      <label>Refresh Token</label>
-      <input type="password" id="refresh-token" placeholder="1//0...">
-    </div>
-    <div style="margin-bottom:20px">
-      <label>Anthropic API-nøkkel (for AI-analyse)</label>
-      <input type="password" id="anthropic-key" placeholder="sk-ant-...">
-    </div>
-    <div style="margin-top:4px;margin-bottom:20px">
-      <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;font-size:11px;letter-spacing:0.05em">
-        <input type="checkbox" id="save-session" checked style="width:auto;margin:0"> 
-        Husk nøkler denne nettlesersession (sessionStorage)
-      </label>
-    </div>
-    <div class="actions-row">
-      <button class="btn btn-primary" onclick="fetchAdsData()">
+    <div class="section-title">Datahenting</div>
+    <p style="font-size:15px;margin-bottom:20px;color:var(--brown)">Alle API-nøkler er lagret sikkert i Cloudflare Worker. Lim inn Worker URL-en over og klikk for å hente data.</p>
+    <div style="display:flex;gap:12px;align-items:center">
+      <button class="btn btn-primary" onclick="fetchAllData()">
         <span>Hent kampanjedata</span>
       </button>
-      <button class="btn btn-secondary" onclick="clearKeys()">Tøm nøkler</button>
-      <div id="status" class="status-bar"></div>
     </div>
+    <div id="status" class="status-bar"></div>
   </div>
 
   <!-- Data section -->
   <div id="data-section">
-    <!-- Stats -->
     <div class="stats-grid" id="stats-grid"></div>
 
-    <!-- Tabs -->
     <div class="section">
       <div class="tab-nav">
-        <button class="tab-btn active" onclick="showTab('campaigns')">Kampanjer</button>
-        <button class="tab-btn" onclick="showTab('adgroups')">Annonsegrupper</button>
-        <button class="tab-btn" onclick="showTab('ads')">Annonser</button>
-        <button class="tab-btn" onclick="showTab('keywords')">Søkeord</button>
+        <button class="tab-btn active" onclick="showTab('campaigns',event)">Kampanjer</button>
+        <button class="tab-btn" onclick="showTab('adgroups',event)">Annonsegrupper</button>
+        <button class="tab-btn" onclick="showTab('ads',event)">Annonser</button>
+        <button class="tab-btn" onclick="showTab('keywords',event)">Søkeord</button>
       </div>
       <div id="tab-campaigns" class="tab-pane active"></div>
       <div id="tab-adgroups" class="tab-pane"></div>
@@ -444,17 +238,15 @@
       <div id="tab-keywords" class="tab-pane"></div>
     </div>
 
-    <!-- AI Analysis -->
     <div class="section">
       <div class="section-title">AI-analyse — Salgsoptimalisering</div>
       <button class="btn btn-ai" id="analyse-btn" onclick="runAiAnalysis()">
-        Analyser kampanjer og gi salgsanbefalinger for møbler
+        Analyser kampanjer og gi salgsanbefalinger
       </button>
       <div id="ai-status" class="status-bar"></div>
     </div>
   </div>
 
-  <!-- AI output -->
   <div id="ai-output">
     <div class="section-title">Analyse fra Claude</div>
     <div class="ai-content" id="ai-content"></div>
@@ -463,291 +255,208 @@
 </div>
 
 <script>
+// ---- Config ----
+const APP_PASSWORD = 'Novooi26';
 let adsData = {};
 
-// --- Password gate ---
+// ---- Gate ----
 function checkGate() {
-  const val = document.getElementById('gate-input').value;
-  if (val === 'Novooi26') {
+  if (document.getElementById('gate-input').value === APP_PASSWORD) {
     document.getElementById('gate').classList.add('hidden');
-    loadFromSession();
+    loadWorkerUrl();
   } else {
     document.getElementById('gate-error').textContent = 'Feil passord';
     document.getElementById('gate-input').value = '';
   }
 }
 
-// --- sessionStorage ---
-const KEYS = ['dev-token','customer-id','client-id','client-secret','refresh-token','anthropic-key'];
-
-function loadFromSession() {
-  KEYS.forEach(k => {
-    const val = sessionStorage.getItem('novooi_ads_' + k);
-    if (val) document.getElementById(k).value = val;
-  });
+// ---- Worker URL ----
+function loadWorkerUrl() {
+  const saved = sessionStorage.getItem('novooi_worker_url');
+  if (saved) {
+    document.getElementById('worker-url').value = saved;
+    document.getElementById('worker-status').textContent = 'klar';
+    document.getElementById('worker-status').style.color = 'var(--green)';
+  }
 }
 
-function saveToSession() {
-  if (!document.getElementById('save-session').checked) return;
-  KEYS.forEach(k => {
-    const val = document.getElementById(k).value;
-    if (val) sessionStorage.setItem('novooi_ads_' + k, val);
-  });
+function saveWorkerUrl() {
+  const val = document.getElementById('worker-url').value.trim();
+  sessionStorage.setItem('novooi_worker_url', val);
+  document.getElementById('worker-status').textContent = val ? 'klar' : 'ikke satt';
+  document.getElementById('worker-status').style.color = val ? 'var(--green)' : 'var(--taupe)';
 }
 
-function clearKeys() {
-  KEYS.forEach(k => {
-    sessionStorage.removeItem('novooi_ads_' + k);
-    document.getElementById(k).value = '';
-  });
-  showStatus('Nøkler slettet', 'success');
+function getWorkerUrl() {
+  const url = document.getElementById('worker-url').value.trim().replace(/\/$/, '');
+  if (!url) throw new Error('Lim inn Worker URL øverst på siden');
+  return url;
 }
 
-function showStatus(msg, type='') {
-  const el = document.getElementById('status');
-  el.textContent = msg;
-  el.className = 'status-bar visible' + (type ? ' ' + type : '');
-}
-
-function showAiStatus(msg, type='') {
-  const el = document.getElementById('ai-status');
-  el.textContent = msg;
-  el.className = 'status-bar visible' + (type ? ' ' + type : '');
-}
-
-function showTab(name) {
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  event.target.classList.add('active');
-}
-
-function fmt(n) {
-  if (!n && n !== 0) return '—';
-  return Number(n).toLocaleString('nb-NO');
-}
-
-function fmtCurrency(micros) {
-  if (!micros && micros !== 0) return '—';
-  return 'kr ' + (micros / 1000000).toLocaleString('nb-NO', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-}
-
-function fmtPct(n) {
-  if (!n && n !== 0) return '—';
-  return (n * 100).toFixed(2) + '%';
-}
-
-async function getAccessToken() {
-  const resp = await fetch('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id: document.getElementById('client-id').value,
-      client_secret: document.getElementById('client-secret').value,
-      refresh_token: document.getElementById('refresh-token').value,
-      grant_type: 'refresh_token'
-    })
-  });
-  const data = await resp.json();
-  if (!data.access_token) throw new Error('Kunne ikke hente access token: ' + JSON.stringify(data));
-  return data.access_token;
-}
-
-async function gaqlQuery(accessToken, query) {
-  const customerId = document.getElementById('customer-id').value.replace(/-/g, '');
-  const devToken = document.getElementById('dev-token').value;
-  const resp = await fetch(`https://googleads.googleapis.com/v17/customers/${customerId}/googleAds:search`, {
-    method: 'POST',
+// ---- API calls via Worker ----
+async function workerFetch(path, body = null) {
+  const workerUrl = getWorkerUrl();
+  const opts = {
+    method: body ? 'POST' : 'GET',
     headers: {
-      'Authorization': 'Bearer ' + accessToken,
-      'developer-token': devToken,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ query })
-  });
+      'Content-Type': 'application/json',
+      'X-App-Password': APP_PASSWORD
+    }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const resp = await fetch(workerUrl + path, opts);
   const data = await resp.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.results || [];
+  if (data.error) throw new Error(data.error);
+  return data;
 }
 
-async function fetchAdsData() {
-  saveToSession();
+// ---- Fetch all data ----
+async function fetchAllData() {
   try {
-    showStatus('Henter access token...', '');
-    const token = await getAccessToken();
-
     showStatus('Henter kampanjer...', '');
-    const campaigns = await gaqlQuery(token, `
-      SELECT campaign.id, campaign.name, campaign.status, campaign.advertising_channel_type,
-        metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions,
-        metrics.ctr, metrics.average_cpc, metrics.conversion_rate
-      FROM campaign
-      WHERE segments.date DURING LAST_30_DAYS
-      ORDER BY metrics.cost_micros DESC
-      LIMIT 50
-    `);
 
-    showStatus('Henter annonsegrupper...', '');
-    const adGroups = await gaqlQuery(token, `
-      SELECT ad_group.id, ad_group.name, ad_group.status, campaign.name,
-        metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions, metrics.ctr
-      FROM ad_group
-      WHERE segments.date DURING LAST_30_DAYS
-      ORDER BY metrics.cost_micros DESC
-      LIMIT 50
-    `);
+    const [campaigns, adGroups, ads, keywords] = await Promise.all([
+      workerFetch('/ads/query', { query: `
+        SELECT campaign.id, campaign.name, campaign.status, campaign.advertising_channel_type,
+          metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions,
+          metrics.ctr, metrics.average_cpc, metrics.conversion_rate
+        FROM campaign WHERE segments.date DURING LAST_30_DAYS
+        ORDER BY metrics.cost_micros DESC LIMIT 50` }),
 
-    showStatus('Henter annonser...', '');
-    const ads = await gaqlQuery(token, `
-      SELECT ad_group_ad.ad.id, ad_group_ad.ad.type, ad_group_ad.status,
-        ad_group_ad.ad.responsive_search_ad.headlines,
-        ad_group_ad.ad.responsive_search_ad.descriptions,
-        ad_group_ad.ad.final_urls,
-        campaign.name, ad_group.name,
-        metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions, metrics.ctr
-      FROM ad_group_ad
-      WHERE segments.date DURING LAST_30_DAYS
-      ORDER BY metrics.impressions DESC
-      LIMIT 50
-    `);
+      workerFetch('/ads/query', { query: `
+        SELECT ad_group.id, ad_group.name, ad_group.status, campaign.name,
+          metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions, metrics.ctr
+        FROM ad_group WHERE segments.date DURING LAST_30_DAYS
+        ORDER BY metrics.cost_micros DESC LIMIT 50` }),
 
-    showStatus('Henter søkeord...', '');
-    const keywords = await gaqlQuery(token, `
-      SELECT ad_group_criterion.keyword.text, ad_group_criterion.keyword.match_type,
-        ad_group_criterion.status, campaign.name, ad_group.name,
-        metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions,
-        metrics.ctr, metrics.average_cpc, metrics.quality_score
-      FROM keyword_view
-      WHERE segments.date DURING LAST_30_DAYS
-      ORDER BY metrics.cost_micros DESC
-      LIMIT 100
-    `);
+      workerFetch('/ads/query', { query: `
+        SELECT ad_group_ad.ad.id, ad_group_ad.ad.type, ad_group_ad.status,
+          ad_group_ad.ad.responsive_search_ad.headlines,
+          ad_group_ad.ad.responsive_search_ad.descriptions,
+          campaign.name, ad_group.name,
+          metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions, metrics.ctr
+        FROM ad_group_ad WHERE segments.date DURING LAST_30_DAYS
+        ORDER BY metrics.impressions DESC LIMIT 50` }),
 
-    adsData = { campaigns, adGroups, ads, keywords };
+      workerFetch('/ads/query', { query: `
+        SELECT ad_group_criterion.keyword.text, ad_group_criterion.keyword.match_type,
+          ad_group_criterion.status, campaign.name, ad_group.name,
+          metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions,
+          metrics.ctr, metrics.average_cpc, metrics.quality_score
+        FROM keyword_view WHERE segments.date DURING LAST_30_DAYS
+        ORDER BY metrics.cost_micros DESC LIMIT 100` })
+    ]);
+
+    adsData = {
+      campaigns: campaigns.results,
+      adGroups: adGroups.results,
+      ads: ads.results,
+      keywords: keywords.results
+    };
+
     renderData(adsData);
     showStatus('Data hentet — siste 30 dager', 'success');
 
   } catch (err) {
     showStatus('Feil: ' + err.message, 'error');
-    console.error(err);
   }
 }
 
+// ---- Helpers ----
+function fmt(n) { return n ? Number(n).toLocaleString('nb-NO') : '—'; }
+function fmtCurrency(m) { return m ? 'kr ' + (m/1000000).toLocaleString('nb-NO', {minimumFractionDigits:2, maximumFractionDigits:2}) : '—'; }
+function fmtPct(n) { return n ? (n*100).toFixed(2)+'%' : '—'; }
+
+function showStatus(msg, type='') {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status-bar visible' + (type ? ' '+type : '');
+}
+
+function showAiStatus(msg, type='') {
+  const el = document.getElementById('ai-status');
+  el.textContent = msg;
+  el.className = 'status-bar visible' + (type ? ' '+type : '');
+}
+
+function showTab(name, e) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  e.target.classList.add('active');
+}
+
+// ---- Render ----
 function renderData({ campaigns, adGroups, ads, keywords }) {
   document.getElementById('data-section').classList.add('visible');
 
-  // Stats
-  const totalSpend = campaigns.reduce((s, c) => s + (c.metrics?.costMicros || 0), 0);
-  const totalClicks = campaigns.reduce((s, c) => s + (c.metrics?.clicks || 0), 0);
-  const totalImpressions = campaigns.reduce((s, c) => s + (c.metrics?.impressions || 0), 0);
-  const totalConversions = campaigns.reduce((s, c) => s + (c.metrics?.conversions || 0), 0);
+  const totalSpend = campaigns.reduce((s,c) => s+(c.metrics?.costMicros||0), 0);
+  const totalClicks = campaigns.reduce((s,c) => s+(c.metrics?.clicks||0), 0);
+  const totalImpressions = campaigns.reduce((s,c) => s+(c.metrics?.impressions||0), 0);
+  const totalConversions = campaigns.reduce((s,c) => s+(c.metrics?.conversions||0), 0);
 
   document.getElementById('stats-grid').innerHTML = `
     <div class="stat-card"><span class="stat-value">${fmtCurrency(totalSpend)}</span><span class="stat-label">Forbruk (30d)</span></div>
     <div class="stat-card"><span class="stat-value">${fmt(totalClicks)}</span><span class="stat-label">Klikk</span></div>
     <div class="stat-card"><span class="stat-value">${fmt(totalImpressions)}</span><span class="stat-label">Visninger</span></div>
-    <div class="stat-card"><span class="stat-value">${totalConversions.toFixed(1)}</span><span class="stat-label">Konverteringer</span></div>
-  `;
+    <div class="stat-card"><span class="stat-value">${totalConversions.toFixed(1)}</span><span class="stat-label">Konverteringer</span></div>`;
 
-  // Campaigns table
-  document.getElementById('tab-campaigns').innerHTML = `
-    <table>
-      <thead><tr>
-        <th>Kampanje</th><th>Status</th><th>Type</th>
-        <th>Visninger</th><th>Klikk</th><th>CTR</th><th>Forbruk</th><th>Konv.</th>
-      </tr></thead>
-      <tbody>
-        ${campaigns.map(c => `
-          <tr>
-            <td>${c.campaign?.name || '—'}</td>
-            <td><span class="badge ${c.campaign?.status === 'ENABLED' ? 'badge-green' : 'badge-gray'}">${c.campaign?.status || '—'}</span></td>
-            <td class="mono">${(c.campaign?.advertisingChannelType || '—').replace('_', ' ')}</td>
-            <td class="mono">${fmt(c.metrics?.impressions)}</td>
-            <td class="mono">${fmt(c.metrics?.clicks)}</td>
-            <td class="mono">${fmtPct(c.metrics?.ctr)}</td>
-            <td class="mono">${fmtCurrency(c.metrics?.costMicros)}</td>
-            <td class="mono">${c.metrics?.conversions?.toFixed(1) || '0'}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  `;
+  document.getElementById('tab-campaigns').innerHTML = `<table>
+    <thead><tr><th>Kampanje</th><th>Status</th><th>Type</th><th>Visninger</th><th>Klikk</th><th>CTR</th><th>Forbruk</th><th>Konv.</th></tr></thead>
+    <tbody>${campaigns.map(c=>`<tr>
+      <td>${c.campaign?.name||'—'}</td>
+      <td><span class="badge ${c.campaign?.status==='ENABLED'?'badge-green':'badge-gray'}">${c.campaign?.status||'—'}</span></td>
+      <td class="mono">${(c.campaign?.advertisingChannelType||'—').replace('_',' ')}</td>
+      <td class="mono">${fmt(c.metrics?.impressions)}</td>
+      <td class="mono">${fmt(c.metrics?.clicks)}</td>
+      <td class="mono">${fmtPct(c.metrics?.ctr)}</td>
+      <td class="mono">${fmtCurrency(c.metrics?.costMicros)}</td>
+      <td class="mono">${c.metrics?.conversions?.toFixed(1)||'0'}</td>
+    </tr>`).join('')}</tbody></table>`;
 
-  // Ad groups
-  document.getElementById('tab-adgroups').innerHTML = `
-    <table>
-      <thead><tr>
-        <th>Annonsegruppe</th><th>Kampanje</th><th>Status</th>
-        <th>Visninger</th><th>Klikk</th><th>CTR</th><th>Forbruk</th>
-      </tr></thead>
-      <tbody>
-        ${adGroups.map(ag => `
-          <tr>
-            <td>${ag.adGroup?.name || '—'}</td>
-            <td class="mono" style="font-size:11px">${ag.campaign?.name || '—'}</td>
-            <td><span class="badge ${ag.adGroup?.status === 'ENABLED' ? 'badge-green' : 'badge-gray'}">${ag.adGroup?.status || '—'}</span></td>
-            <td class="mono">${fmt(ag.metrics?.impressions)}</td>
-            <td class="mono">${fmt(ag.metrics?.clicks)}</td>
-            <td class="mono">${fmtPct(ag.metrics?.ctr)}</td>
-            <td class="mono">${fmtCurrency(ag.metrics?.costMicros)}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  `;
+  document.getElementById('tab-adgroups').innerHTML = `<table>
+    <thead><tr><th>Annonsegruppe</th><th>Kampanje</th><th>Status</th><th>Visninger</th><th>Klikk</th><th>CTR</th><th>Forbruk</th></tr></thead>
+    <tbody>${adGroups.map(ag=>`<tr>
+      <td>${ag.adGroup?.name||'—'}</td>
+      <td class="mono" style="font-size:11px">${ag.campaign?.name||'—'}</td>
+      <td><span class="badge ${ag.adGroup?.status==='ENABLED'?'badge-green':'badge-gray'}">${ag.adGroup?.status||'—'}</span></td>
+      <td class="mono">${fmt(ag.metrics?.impressions)}</td>
+      <td class="mono">${fmt(ag.metrics?.clicks)}</td>
+      <td class="mono">${fmtPct(ag.metrics?.ctr)}</td>
+      <td class="mono">${fmtCurrency(ag.metrics?.costMicros)}</td>
+    </tr>`).join('')}</tbody></table>`;
 
-  // Ads
-  document.getElementById('tab-ads').innerHTML = `
-    <table>
-      <thead><tr>
-        <th>Annonse</th><th>Kampanje</th><th>Status</th>
-        <th>Visninger</th><th>Klikk</th><th>CTR</th><th>Konv.</th>
-      </tr></thead>
-      <tbody>
-        ${ads.map(a => {
-          const headlines = a.adGroupAd?.ad?.responsiveSearchAd?.headlines?.slice(0,2).map(h => h.text).join(' / ') || a.adGroupAd?.ad?.type || '—';
-          return `<tr>
-            <td style="max-width:280px;font-size:13px">${headlines}</td>
-            <td class="mono" style="font-size:11px">${a.campaign?.name || '—'}</td>
-            <td><span class="badge ${a.adGroupAd?.status === 'ENABLED' ? 'badge-green' : 'badge-gray'}">${a.adGroupAd?.status || '—'}</span></td>
-            <td class="mono">${fmt(a.metrics?.impressions)}</td>
-            <td class="mono">${fmt(a.metrics?.clicks)}</td>
-            <td class="mono">${fmtPct(a.metrics?.ctr)}</td>
-            <td class="mono">${a.metrics?.conversions?.toFixed(1) || '0'}</td>
-          </tr>`;
-        }).join('')}
-      </tbody>
-    </table>
-  `;
+  document.getElementById('tab-ads').innerHTML = `<table>
+    <thead><tr><th>Annonse</th><th>Kampanje</th><th>Status</th><th>Visninger</th><th>Klikk</th><th>CTR</th><th>Konv.</th></tr></thead>
+    <tbody>${ads.map(a=>{
+      const h = a.adGroupAd?.ad?.responsiveSearchAd?.headlines?.slice(0,2).map(h=>h.text).join(' / ') || a.adGroupAd?.ad?.type || '—';
+      return `<tr>
+        <td style="max-width:280px;font-size:13px">${h}</td>
+        <td class="mono" style="font-size:11px">${a.campaign?.name||'—'}</td>
+        <td><span class="badge ${a.adGroupAd?.status==='ENABLED'?'badge-green':'badge-gray'}">${a.adGroupAd?.status||'—'}</span></td>
+        <td class="mono">${fmt(a.metrics?.impressions)}</td>
+        <td class="mono">${fmt(a.metrics?.clicks)}</td>
+        <td class="mono">${fmtPct(a.metrics?.ctr)}</td>
+        <td class="mono">${a.metrics?.conversions?.toFixed(1)||'0'}</td>
+      </tr>`;
+    }).join('')}</tbody></table>`;
 
-  // Keywords
-  document.getElementById('tab-keywords').innerHTML = `
-    <table>
-      <thead><tr>
-        <th>Søkeord</th><th>Match</th><th>Kampanje</th>
-        <th>Visninger</th><th>Klikk</th><th>CTR</th><th>Gj.sn. CPC</th><th>QS</th>
-      </tr></thead>
-      <tbody>
-        ${keywords.map(k => `
-          <tr>
-            <td style="font-weight:500">${k.adGroupCriterion?.keyword?.text || '—'}</td>
-            <td><span class="badge badge-gray">${k.adGroupCriterion?.keyword?.matchType || '—'}</span></td>
-            <td class="mono" style="font-size:11px">${k.campaign?.name || '—'}</td>
-            <td class="mono">${fmt(k.metrics?.impressions)}</td>
-            <td class="mono">${fmt(k.metrics?.clicks)}</td>
-            <td class="mono">${fmtPct(k.metrics?.ctr)}</td>
-            <td class="mono">${fmtCurrency(k.metrics?.averageCpc)}</td>
-            <td class="mono">${k.metrics?.qualityScore || '—'}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  `;
+  document.getElementById('tab-keywords').innerHTML = `<table>
+    <thead><tr><th>Søkeord</th><th>Match</th><th>Kampanje</th><th>Visninger</th><th>Klikk</th><th>CTR</th><th>Gj.sn. CPC</th><th>QS</th></tr></thead>
+    <tbody>${keywords.map(k=>`<tr>
+      <td style="font-weight:500">${k.adGroupCriterion?.keyword?.text||'—'}</td>
+      <td><span class="badge badge-gray">${k.adGroupCriterion?.keyword?.matchType||'—'}</span></td>
+      <td class="mono" style="font-size:11px">${k.campaign?.name||'—'}</td>
+      <td class="mono">${fmt(k.metrics?.impressions)}</td>
+      <td class="mono">${fmt(k.metrics?.clicks)}</td>
+      <td class="mono">${fmtPct(k.metrics?.ctr)}</td>
+      <td class="mono">${fmtCurrency(k.metrics?.averageCpc)}</td>
+      <td class="mono">${k.metrics?.qualityScore||'—'}</td>
+    </tr>`).join('')}</tbody></table>`;
 }
 
+// ---- AI Analysis ----
 async function runAiAnalysis() {
-  const apiKey = document.getElementById('anthropic-key').value;
-  if (!apiKey) { showAiStatus('Legg inn Anthropic API-nøkkel først', 'error'); return; }
   if (!adsData.campaigns) { showAiStatus('Hent kampanjedata først', 'error'); return; }
 
   const btn = document.getElementById('analyse-btn');
@@ -755,102 +464,45 @@ async function runAiAnalysis() {
   btn.innerHTML = '<span class="spinner"></span> Analyserer...';
   showAiStatus('Sender data til Claude...', '');
 
-  const summary = {
-    campaigns: adsData.campaigns.map(c => ({
-      name: c.campaign?.name,
-      status: c.campaign?.status,
-      type: c.campaign?.advertisingChannelType,
-      impressions: c.metrics?.impressions,
-      clicks: c.metrics?.clicks,
-      ctr: c.metrics?.ctr,
-      costMicros: c.metrics?.costMicros,
-      conversions: c.metrics?.conversions,
-      conversionRate: c.metrics?.conversionRate,
-      avgCpc: c.metrics?.averageCpc
-    })),
-    topKeywords: adsData.keywords.slice(0, 30).map(k => ({
-      keyword: k.adGroupCriterion?.keyword?.text,
-      matchType: k.adGroupCriterion?.keyword?.matchType,
-      campaign: k.campaign?.name,
-      impressions: k.metrics?.impressions,
-      clicks: k.metrics?.clicks,
-      ctr: k.metrics?.ctr,
-      costMicros: k.metrics?.costMicros,
-      conversions: k.metrics?.conversions,
-      qualityScore: k.metrics?.qualityScore
-    })),
-    topAds: adsData.ads.slice(0, 10).map(a => ({
-      headlines: a.adGroupAd?.ad?.responsiveSearchAd?.headlines?.map(h => h.text),
-      descriptions: a.adGroupAd?.ad?.responsiveSearchAd?.descriptions?.map(d => d.text),
-      campaign: a.campaign?.name,
-      impressions: a.metrics?.impressions,
-      clicks: a.metrics?.clicks,
-      ctr: a.metrics?.ctr,
-      conversions: a.metrics?.conversions
-    }))
-  };
-
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-opus-4-5',
-        max_tokens: 4000,
-        system: `Du er en ekspert på Google Ads og e-commerce for møbler og premium interiør i det norske markedet.
-Novooi er en norsk premium nettbutikk for interiør og møbler som aggregerer 100+ norske designere og merkevarer.
-Analyser kampanjedata og gi konkrete, handlingsrettede anbefalinger på norsk.
-Bruk markdown-formatering med overskrifter (###), punktlister og fremhev nøkkeltall med **bold**.
-Vær direkte og konkret — ikke generisk. Prioriter de tiltakene som vil ha størst effekt på salg.`,
-        messages: [{
-          role: 'user',
-          content: `Analyser disse Google Ads-dataene fra Novooi (siste 30 dager) og gi konkrete anbefalinger for å øke salg av møbler og interiør:\n\n${JSON.stringify(summary, null, 2)}\n\nFokuser på:\n1. Kampanjestruktur og budsjettallokering\n2. Søkeordstrategi — hvilke søkeord presterer og hvilke bør kuttes/skaleres\n3. Annonsekvalitet og CTR-forbedringer\n4. Konverteringsoptimalisering\n5. Konkrete neste steg prioritert etter forventet ROI`
-        }]
-      })
-    });
+    const summary = {
+      campaigns: adsData.campaigns.map(c => ({
+        name: c.campaign?.name, status: c.campaign?.status, type: c.campaign?.advertisingChannelType,
+        impressions: c.metrics?.impressions, clicks: c.metrics?.clicks, ctr: c.metrics?.ctr,
+        costMicros: c.metrics?.costMicros, conversions: c.metrics?.conversions
+      })),
+      topKeywords: adsData.keywords.slice(0,30).map(k => ({
+        keyword: k.adGroupCriterion?.keyword?.text, matchType: k.adGroupCriterion?.keyword?.matchType,
+        campaign: k.campaign?.name, impressions: k.metrics?.impressions, clicks: k.metrics?.clicks,
+        ctr: k.metrics?.ctr, costMicros: k.metrics?.costMicros, conversions: k.metrics?.conversions,
+        qualityScore: k.metrics?.qualityScore
+      })),
+      topAds: adsData.ads.slice(0,10).map(a => ({
+        headlines: a.adGroupAd?.ad?.responsiveSearchAd?.headlines?.map(h=>h.text),
+        descriptions: a.adGroupAd?.ad?.responsiveSearchAd?.descriptions?.map(d=>d.text),
+        campaign: a.campaign?.name, impressions: a.metrics?.impressions,
+        clicks: a.metrics?.clicks, ctr: a.metrics?.ctr, conversions: a.metrics?.conversions
+      }))
+    };
 
-    const data = await resp.json();
-    if (data.error) throw new Error(data.error.message);
+    const result = await workerFetch('/analyse', { data: summary });
 
-    const text = data.content[0].text;
     document.getElementById('ai-output').classList.add('visible');
-
-    // Simple markdown to HTML
-    const html = text
-      .replace(/### (.*)/g, '<h3>$1</h3>')
-      .replace(/## (.*)/g, '<h3>$1</h3>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/^- (.*)/gm, '<li>$1</li>')
-      .replace(/(<li>.*<\/li>)/s, (m) => '<ul>' + m + '</ul>')
-      .replace(/\n\n/g, '</p><p>')
-      .replace(/^(?!<[hul])/gm, '<p>')
-      .replace(/<p><\/p>/g, '');
-
-    document.getElementById('ai-content').innerHTML = text
+    document.getElementById('ai-content').innerHTML = result.text
       .split('\n\n')
       .map(block => {
-        if (block.startsWith('### ') || block.startsWith('## ')) {
-          return '<h3>' + block.replace(/^#+\s/, '') + '</h3>';
-        }
+        if (block.startsWith('### ') || block.startsWith('## ')) return '<h3>' + block.replace(/^#+\s/, '') + '</h3>';
         if (block.includes('\n- ') || block.startsWith('- ')) {
-          const items = block.split('\n').filter(l => l.trim());
-          return '<ul>' + items.map(l => '<li>' + l.replace(/^[-*]\s/, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') + '</li>').join('') + '</ul>';
+          return '<ul>' + block.split('\n').filter(l=>l.trim()).map(l=>'<li>'+l.replace(/^[-*]\s/,'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')+'</li>').join('') + '</ul>';
         }
-        return '<p>' + block.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') + '</p>';
-      })
-      .join('');
+        return '<p>' + block.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>') + '</p>';
+      }).join('');
 
     showAiStatus('Analyse fullført', 'success');
     document.getElementById('ai-output').scrollIntoView({ behavior: 'smooth' });
 
   } catch (err) {
     showAiStatus('Feil: ' + err.message, 'error');
-    console.error(err);
   } finally {
     btn.disabled = false;
     btn.textContent = 'Kjør ny analyse';
