@@ -469,6 +469,7 @@ td{padding:9px 12px}
       <p style="font-size:15px;line-height:1.7;margin-bottom:20px;color:var(--brown)">Kjør den daglige analysen manuelt for å teste at e-postvarslingen fungerer. Krever at Worker URL er satt og at <code style="font-family:'Courier Prime',monospace;font-size:12px;background:var(--sand);padding:1px 6px">RESEND_API_KEY</code> og <code style="font-family:'Courier Prime',monospace;font-size:12px;background:var(--sand);padding:1px 6px">ALERT_EMAIL</code> er satt som secrets i Cloudflare.</p>
       <div class="btn-row">
         <button class="btn btn-dark" id="daily-test-btn" onclick="testDailyAlert()">Kjør daglig analyse nå</button>
+        <button class="btn btn-outline" id="demo-alert-btn" onclick="testDemoAlert()">Send test-varsling (demo-data)</button>
       </div>
       <div id="daily-test-status" class="status"></div>
     </div>
@@ -1368,7 +1369,40 @@ function getDemoAnalysis(type){
 }
 
 // ----- DAILY ALERT TEST -----
-async function testDailyAlert(){
+async function testDemoAlert(){
+  const url = getWorker();
+  const btn = document.getElementById('demo-alert-btn');
+  const statusEl = document.getElementById('daily-test-status');
+  if(!url){
+    statusEl.className='status on err';
+    statusEl.textContent='Lim inn Worker URL i feltet øverst først';
+    return;
+  }
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Sender test-varsling...';
+  statusEl.className = 'status on';
+  statusEl.textContent = 'Genererer demo-varsling og sender e-post...';
+  try {
+    const r = await fetch(url+'/send-demo-alert', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-App-Password': PW },
+      body: JSON.stringify({ data: getDataSummary() })
+    });
+    const d = await r.json();
+    if(d.error) throw new Error(d.error);
+    statusEl.className = 'status on ok';
+    statusEl.textContent = 'Test-varsling sendt — sjekk innboksen';
+    logAction('Demo-varsling sendt via e-post');
+  } catch(e) {
+    statusEl.className = 'status on err';
+    statusEl.textContent = 'Feil: ' + e.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Send test-varsling (demo-data)';
+  }
+}
+
+
   const url = getWorker();
   const btn = document.getElementById('daily-test-btn');
   const statusEl = document.getElementById('daily-test-status');
