@@ -593,7 +593,11 @@ function onWorkerInput(){
   setTopStatus(v?'klar':'demo-modus',v?'green':'');
 }
 function onPeriodChange(){ if(!isDemo) fetchAll(); }
-function getWorker(){ return document.getElementById('worker-url').value.trim().replace(/\/$/,''); }
+function getWorker(){
+  let v = document.getElementById('worker-url').value.trim().replace(/\/$/,'');
+  if(v && !v.startsWith('http')) v = 'https://' + v;
+  return v;
+}
 function setTopStatus(msg,color){
   const el=document.getElementById('top-status');
   el.textContent='— '+msg;
