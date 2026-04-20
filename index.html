@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Novooi — Google Ads</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%232c2416'/%3E%3Crect x='5' y='18' width='5' height='9' fill='%23c4b49a'/%3E%3Crect x='13' y='12' width='5' height='15' fill='%23e8dfc8'/%3E%3Crect x='21' y='7' width='5' height='20' fill='%23f5f0e8'/%3E%3Cline x1='4' y1='27' x2='28' y2='27' stroke='%236b4f2a' stroke-width='1.5'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 :root{--cream:#f5f0e8;--warm:#faf7f2;--sand:#e8dfc8;--taupe:#c4b49a;--brown:#8b7355;--dark:#2c2416;--ink:#3d3020;--accent:#6b4f2a;--red:#a0392a;--green:#3a6b4f;--border:#d4c8b0;--orange:#c47820}
@@ -549,12 +550,19 @@ let chatHistory = [];
 
 // ----- GATE -----
 function checkGate(){
-  if(document.getElementById('gate-pw').value===PW){
+  const input = document.getElementById('gate-pw');
+  const errEl = document.getElementById('gate-err');
+  if(!input) return;
+  const val = input.value;
+  if(val === PW){
     document.getElementById('gate').classList.add('hidden');
-    init();
+    try { init(); } catch(e) { console.error('Init error:', e); }
+  } else if(val === '') {
+    errEl.textContent = 'Skriv inn passord';
   } else {
-    document.getElementById('gate-err').textContent='Feil passord';
-    document.getElementById('gate-pw').value='';
+    errEl.textContent = 'Feil passord';
+    input.value = '';
+    input.focus();
   }
 }
 
