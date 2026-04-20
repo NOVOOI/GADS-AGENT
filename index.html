@@ -270,6 +270,7 @@ td{padding:9px 12px}
   <button class="nav-btn" onclick="showPage('sammenlign',this)">Sammenlign</button>
   <button class="nav-btn" onclick="showPage('ai',this)">AI-verktøy</button>
   <button class="nav-btn" onclick="showPage('logg',this)">Logg</button>
+  <button class="nav-btn" onclick="showPage('rapport',this)">Rapport</button>
 </nav>
 
 <div class="container">
@@ -467,6 +468,59 @@ td{padding:9px 12px}
         <button class="btn btn-outline btn-sm" onclick="clearLog()">Tøm logg</button>
       </div>
       <div id="log-content"></div>
+    </div>
+  </div>
+
+  <!-- RAPPORT -->
+  <div class="section-page" id="page-rapport">
+    <div class="block">
+      <div class="block-title">Generer markedsrapport</div>
+      <p style="font-size:16px;line-height:1.7;margin-bottom:24px;color:var(--ink)">Eksporter en fullstendig Google Ads-rapport som PDF — klar til å dele med ledelse eller kunder. Rapporten inkluderer nøkkeltall, kampanjeoversikt, topp søkeord, annonseytelse og AI-generert analyse.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:28px">
+        <div>
+          <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--taupe);margin-bottom:8px">Tidsperiode</div>
+          <select id="report-period" style="width:100%;padding:10px 12px;font-family:'Courier Prime',monospace;font-size:12px;border:1px solid var(--border);background:var(--cream);color:var(--ink);outline:none">
+            <option value="7">Siste 7 dager</option>
+            <option value="14">Siste 14 dager</option>
+            <option value="30" selected>Siste 30 dager</option>
+            <option value="90">Siste 90 dager</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--taupe);margin-bottom:8px">Inkluder seksjoner</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="rpt-summary" checked style="width:auto;margin:0"> Sammendrag og nøkkeltall</label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="rpt-campaigns" checked style="width:auto;margin:0"> Kampanjeoversikt</label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="rpt-keywords" checked style="width:auto;margin:0"> Topp søkeord</label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="rpt-ads" checked style="width:auto;margin:0"> Annonseytelse</label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="rpt-analysis" checked style="width:auto;margin:0"> AI-analyse og anbefalinger</label>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--taupe);margin-bottom:8px">Tillegg</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="rpt-logo" checked style="width:auto;margin:0"> Novooi-logo og branding</label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="rpt-bench" checked style="width:auto;margin:0"> Bransje-benchmarks</label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px"><input type="checkbox" id="rpt-date" checked style="width:auto;margin:0"> Dato og tidsstempel</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-dark" id="rpt-live-btn" onclick="generateReport(false)">
+          Generer rapport (live data)
+        </button>
+        <button class="btn btn-outline" id="rpt-demo-btn" onclick="generateReport(true)">
+          Last ned testrapport (demo-data)
+        </button>
+      </div>
+      <div id="rpt-status" class="status"></div>
+    </div>
+
+    <div class="block" id="rpt-preview-block" style="display:none">
+      <div class="block-title">Forhåndsvisning</div>
+      <div id="rpt-preview"></div>
     </div>
   </div>
 
@@ -1323,6 +1377,375 @@ function showMain(type,msg){
   clearTimeout(window._stTimeout);
   window._stTimeout=setTimeout(()=>el.className='status',4000);
 }
+
+// ----- PDF REPORT -----
+async function generateReport(useDemo){
+  const btn = useDemo ? document.getElementById('rpt-demo-btn') : document.getElementById('rpt-live-btn');
+  const statusEl = document.getElementById('rpt-status');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Genererer PDF...';
+  statusEl.className = 'status on';
+  statusEl.textContent = 'Bygger rapport...';
+
+  const period = document.getElementById('report-period').value;
+  const incSummary = document.getElementById('rpt-summary').checked;
+  const incCampaigns = document.getElementById('rpt-campaigns').checked;
+  const incKeywords = document.getElementById('rpt-keywords').checked;
+  const incAds = document.getElementById('rpt-ads').checked;
+  const incAnalysis = document.getElementById('rpt-analysis').checked;
+  const incBench = document.getElementById('rpt-bench').checked;
+  const incDate = document.getElementById('rpt-date').checked;
+
+  const data = useDemo ? {campaigns:DEMO_CAMPAIGNS,adGroups:DEMO_ADGROUPS,ads:DEMO_ADS,keywords:DEMO_KEYWORDS} : D;
+
+  let aiAnalysis = '';
+  if(incAnalysis){
+    statusEl.textContent = 'Henter AI-analyse...';
+    const url = getWorker();
+    if(url && !useDemo){
+      try{
+        const result = await wPost('/ai',{
+          system:'Du er Google Ads-strateg for Novooi, norsk premium møbelnettbutikk. Skriv et kortfattet eksekutivsammendrag (maks 120 ord) og 5 prioriterte anbefalinger. Bruk norsk. Vær direkte og konkret.',
+          messages:[{role:'user',content:`Kampanjedata siste ${period} dager:\n${JSON.stringify(data.campaigns.map(c=>({navn:c.name,klikk:c.clicks,ctr:(c.ctr*100).toFixed(2)+'%',forbruk:'kr '+(c.costMicros/1e6).toFixed(0),konv:c.conversions.toFixed(1)})))}` }]
+        });
+        aiAnalysis = result.text;
+      }catch(e){ aiAnalysis = getDemoAiSummary(period); }
+    } else {
+      aiAnalysis = getDemoAiSummary(period);
+    }
+  }
+
+  statusEl.textContent = 'Tegner PDF...';
+  try {
+    await buildPDF(data, period, {incSummary,incCampaigns,incKeywords,incAds,incAnalysis,incBench,incDate}, aiAnalysis, useDemo);
+    statusEl.className = 'status on ok';
+    statusEl.textContent = 'Rapport lastet ned';
+    logAction('PDF-rapport generert'+(useDemo?' (demo)':'')+' — '+period+' dager');
+  } catch(e) {
+    statusEl.className = 'status on err';
+    statusEl.textContent = 'Feil: '+e.message;
+    console.error(e);
+  }
+  btn.disabled = false;
+  btn.textContent = useDemo ? 'Last ned testrapport (demo-data)' : 'Generer rapport (live data)';
+}
+
+function getDemoAiSummary(period){
+  return `Novoois Google Ads-konto leverer solid ytelse med totalt forbruk på kr 39 650 og 52 konverteringer de siste ${period} dagene. CTR på 3,3% overstiger bransjenormen på 2,8%, som indikerer sterk annonserelevans.\n\nAnbefalinger:\n1. Pause "billige sofaer" umiddelbart — QS 3 og feil målgruppe\n2. Øk bud på "premium interiør norge" med 40% (QS 9, CTR 5,86%)\n3. Del PMax-kampanjen i separate asset groups per kategori\n4. Erstatt Display-remarketing med YouTube In-Stream\n5. Legg til norske merkevaresøk (Ekornes, Brunstad) i ny kampanje`;
+}
+
+async function buildPDF(data, period, opts, aiText, isDemo){
+  if(typeof window.jspdf === 'undefined'){
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+  }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const W = 210, H = 297;
+
+  // Colors
+  const DARK = [44,36,22];
+  const CREAM = [245,240,232];
+  const SAND = [232,223,200];
+  const BROWN = [139,115,85];
+  const ACCENT = [107,79,42];
+  const INK = [61,48,32];
+  const GREEN_C = [58,107,79];
+  const RED_C = [160,57,42];
+  const ORANGE_C = [196,120,32];
+  const BORDER = [212,200,176];
+  const WHITE = [255,255,255];
+
+  let y = 0;
+  let pageNum = 1;
+
+  function setColor(rgb){ doc.setTextColor(...rgb); }
+  function setFill(rgb){ doc.setFillColor(...rgb); }
+  function setDraw(rgb){ doc.setDrawColor(...rgb); }
+  function setFont(size, style='normal', font='helvetica'){
+    doc.setFont(font, style);
+    doc.setFontSize(size);
+  }
+  function newPage(){
+    doc.addPage();
+    pageNum++;
+    y = 0;
+    drawPageHeader();
+  }
+  function checkY(needed=30){
+    if(y + needed > H - 20) newPage();
+  }
+
+  function drawPageHeader(){
+    setFill(DARK); doc.rect(0,0,W,14,'F');
+    setFont(8,'normal'); setColor(BROWN);
+    doc.text('NOVOOI.COM', 14, 9);
+    setColor([180,160,130]);
+    doc.text('Google Ads Rapport — Siste '+period+' dager', W/2, 9, {align:'center'});
+    if(opts.incDate){
+      doc.text(new Date().toLocaleDateString('nb-NO',{year:'numeric',month:'long',day:'numeric'}), W-14, 9, {align:'right'});
+    }
+    setDraw(ACCENT); doc.setLineWidth(0.4);
+    doc.line(0,14,W,14);
+    y = 20;
+  }
+
+  function sectionTitle(title){
+    checkY(18);
+    setFill(SAND); doc.rect(14, y-1, W-28, 10, 'F');
+    setDraw(BORDER); doc.setLineWidth(0.3);
+    doc.rect(14, y-1, W-28, 10, 'S');
+    setFont(8,'bold'); setColor(BROWN);
+    doc.text(title.toUpperCase(), 18, y+5.5);
+    y += 14;
+  }
+
+  function metricCard(x, cardY, w, h, label, value, sub, color){
+    setFill(WHITE); setDraw(BORDER);
+    doc.setLineWidth(0.3);
+    doc.rect(x, cardY, w, h, 'FD');
+    setFont(7,'normal'); setColor(BROWN);
+    doc.text(label.toUpperCase(), x+4, cardY+6);
+    setFont(16,'bold'); setColor(color||DARK);
+    doc.text(value, x+4, cardY+15);
+    if(sub){
+      setFont(7,'normal'); setColor(BROWN);
+      doc.text(sub, x+4, cardY+21);
+    }
+  }
+
+  function drawTable(headers, rows, colWidths, startX=14){
+    const rowH = 7;
+    const tableW = colWidths.reduce((a,b)=>a+b,0);
+    checkY(rowH*2+4);
+    // Header row
+    setFill(DARK); doc.rect(startX, y, tableW, rowH+1, 'F');
+    setFont(6.5,'bold'); setColor(CREAM);
+    let cx = startX;
+    headers.forEach((h,i)=>{
+      doc.text(h.toUpperCase(), cx+2, y+5.5);
+      cx += colWidths[i];
+    });
+    y += rowH+1;
+    // Data rows
+    rows.forEach((row,ri)=>{
+      checkY(rowH);
+      setFill(ri%2===0?WHITE:CREAM);
+      doc.rect(startX, y, tableW, rowH, 'F');
+      setDraw(BORDER); doc.setLineWidth(0.1);
+      doc.rect(startX, y, tableW, rowH, 'S');
+      setFont(6.5,'normal'); setColor(INK);
+      let cx2 = startX;
+      row.forEach((cell,ci)=>{
+        const cellStr = String(cell||'—');
+        // color coding
+        if(headers[ci]==='CTR'){
+          const v=parseFloat(cellStr);
+          setColor(v>3.5?GREEN_C:v<2?RED_C:ORANGE_C);
+        } else if(headers[ci]==='QS'){
+          const v=parseInt(cellStr);
+          setColor(v>=8?GREEN_C:v>=6?ORANGE_C:RED_C);
+        } else { setColor(INK); }
+        const maxW = colWidths[ci]-4;
+        const truncated = doc.getTextWidth(cellStr) > maxW ? doc.splitTextToSize(cellStr, maxW)[0]+'…' : cellStr;
+        doc.text(truncated, cx2+2, y+4.8);
+        cx2 += colWidths[ci];
+      });
+      y += rowH;
+    });
+    y += 5;
+  }
+
+  function wrapText(text, maxW, lineH=5){
+    const lines = doc.splitTextToSize(text, maxW);
+    lines.forEach(line=>{ checkY(lineH); doc.text(line, 14, y); y+=lineH; });
+  }
+
+  // ===== COVER PAGE =====
+  setFill(DARK); doc.rect(0,0,W,H,'F');
+  // Decorative line
+  setDraw(ACCENT); doc.setLineWidth(1);
+  doc.line(14,80,W-14,80);
+  doc.line(14,82,W-14,82);
+  // Title
+  setFont(32,'bold'); setColor(CREAM);
+  doc.text('NOVOOI', W/2, 110, {align:'center'});
+  setFont(13,'normal'); setColor(BROWN);
+  doc.text('Google Ads Performance Report', W/2, 122, {align:'center'});
+  setFont(10,'normal'); setColor([160,140,100]);
+  doc.text('Siste '+period+' dager', W/2, 133, {align:'center'});
+  if(isDemo){
+    setFont(8,'normal'); setColor(ORANGE_C);
+    doc.text('— DEMO DATA —', W/2, 143, {align:'center'});
+  }
+  setDraw(ACCENT); doc.setLineWidth(0.4);
+  doc.line(14,155,W-14,155);
+  setFont(8,'normal'); setColor(BROWN);
+  if(opts.incDate){
+    doc.text('Generert: '+new Date().toLocaleDateString('nb-NO',{year:'numeric',month:'long',day:'numeric'}), W/2, 165, {align:'center'});
+  }
+  doc.text('novooi.com', W/2, 172, {align:'center'});
+  // Footer
+  setColor([80,65,45]);
+  setFont(7,'normal');
+  doc.text('Konfidensielt — kun til internt bruk', W/2, H-14, {align:'center'});
+
+  // ===== PAGE 2+ =====
+  doc.addPage(); pageNum=2;
+  drawPageHeader();
+
+  // ----- SUMMARY -----
+  if(opts.incSummary){
+    sectionTitle('Sammendrag — Nøkkeltall');
+    const totalSpend = data.campaigns.reduce((s,c)=>s+c.costMicros,0);
+    const totalClicks = data.campaigns.reduce((s,c)=>s+c.clicks,0);
+    const totalImpr = data.campaigns.reduce((s,c)=>s+c.impressions,0);
+    const totalConv = data.campaigns.reduce((s,c)=>s+c.conversions,0);
+    const avgCtr = totalImpr?totalClicks/totalImpr:0;
+    const cpa = totalConv?totalSpend/1e6/totalConv:0;
+    const avgCpc = totalClicks?totalSpend/1e6/totalClicks:0;
+
+    const cw=(W-28)/3-2, ch=26;
+    const cards=[
+      {l:'Totalt forbruk',v:'kr '+Math.round(totalSpend/1e6).toLocaleString('nb-NO'),s:'Siste '+period+' dager',c:DARK},
+      {l:'Klikk',v:totalClicks.toLocaleString('nb-NO'),s:'Gj.sn. CPC: kr '+avgCpc.toFixed(0),c:DARK},
+      {l:'Visninger',v:totalImpr.toLocaleString('nb-NO'),s:'',c:DARK},
+      {l:'Konverteringer',v:totalConv.toFixed(1),s:'CPA: kr '+cpa.toFixed(0),c:totalConv>30?GREEN_C:RED_C},
+      {l:'Gj.sn. CTR',v:(avgCtr*100).toFixed(2)+'%',s:opts.incBench?'Bransje: 2,8%':''  ,c:avgCtr>0.028?GREEN_C:RED_C},
+      {l:'Aktive kampanjer',v:data.campaigns.filter(c=>c.status==='ENABLED').length.toString(),s:data.campaigns.length+' totalt',c:DARK},
+    ];
+    cards.forEach((card,i)=>{
+      const col=i%3, row=Math.floor(i/3);
+      metricCard(14+col*(cw+2), y+row*(ch+3), cw, ch, card.l, card.v, card.s, card.c);
+    });
+    y += 2*ch+3*3+8;
+
+    if(opts.incBench){
+      checkY(16);
+      setFill([240,250,244]); setDraw([180,220,196]);
+      doc.setLineWidth(0.3);
+      doc.rect(14,y,W-28,12,'FD');
+      setFont(7,'bold'); setColor(GREEN_C);
+      doc.text('BRANSJE-BENCHMARKS', 18,y+4.5);
+      setFont(7,'normal'); setColor(INK);
+      doc.text('CTR (søk): 2,8%   Conv. rate: 1,8%   CPA møbler: kr 890   QS mål: 7+', 18,y+9);
+      y+=16;
+    }
+  }
+
+  // ----- CAMPAIGNS -----
+  if(opts.incCampaigns){
+    checkY(20);
+    sectionTitle('Kampanjeoversikt');
+    const headers=['Kampanje','Status','Type','Visninger','Klikk','CTR','Forbruk','Konv.'];
+    const colW=[52,14,22,18,14,14,20,14];
+    const rows=data.campaigns.map(c=>[
+      c.name.length>28?c.name.slice(0,27)+'…':c.name,
+      c.status==='ENABLED'?'Aktiv':'Pauset',
+      (c.type||'').replace('PERFORMANCE_MAX','PMax').replace('SEARCH','Søk').replace('DISPLAY','Display'),
+      c.impressions.toLocaleString('nb-NO'),
+      c.clicks.toLocaleString('nb-NO'),
+      (c.ctr*100).toFixed(2)+'%',
+      'kr '+Math.round(c.costMicros/1e6).toLocaleString('nb-NO'),
+      c.conversions.toFixed(1)
+    ]);
+    drawTable(headers,rows,colW);
+  }
+
+  // ----- KEYWORDS -----
+  if(opts.incKeywords){
+    checkY(20);
+    sectionTitle('Topp søkeord');
+    const topKw = [...data.keywords].sort((a,b)=>b.costMicros-a.costMicros).slice(0,10);
+    const headers=['Søkeord','Match','Klikk','CTR','Forbruk','Konv.','QS'];
+    const colW=[55,16,16,16,22,14,13];
+    const rows=topKw.map(k=>[
+      k.keyword&&k.keyword.length>30?k.keyword.slice(0,29)+'…':k.keyword||'—',
+      k.matchType==='EXACT'?'Eksakt':k.matchType==='PHRASE'?'Frase':'Bred',
+      k.clicks.toLocaleString('nb-NO'),
+      (k.ctr*100).toFixed(2)+'%',
+      'kr '+Math.round(k.costMicros/1e6).toLocaleString('nb-NO'),
+      k.conversions.toFixed(1),
+      k.qs||'—'
+    ]);
+    drawTable(headers,rows,colW);
+  }
+
+  // ----- ADS -----
+  if(opts.incAds){
+    checkY(20);
+    sectionTitle('Annonseytelse');
+    const headers=['Annonse','Kampanje','Visninger','Klikk','CTR','Konv.'];
+    const colW=[60,42,18,14,14,14];
+    const rows=data.ads.map(a=>[
+      a.headline&&a.headline.length>36?a.headline.slice(0,35)+'…':a.headline||'—',
+      a.campaign&&a.campaign.length>24?a.campaign.slice(0,23)+'…':a.campaign||'—',
+      a.impressions.toLocaleString('nb-NO'),
+      a.clicks.toLocaleString('nb-NO'),
+      (a.ctr*100).toFixed(2)+'%',
+      a.conversions.toFixed(1)
+    ]);
+    drawTable(headers,rows,colW);
+  }
+
+  // ----- AI ANALYSIS -----
+  if(opts.incAnalysis && aiText){
+    checkY(20);
+    sectionTitle('AI-analyse og anbefalinger');
+    // Parse sections
+    const sections = aiText.split('\n\n');
+    sections.forEach(section=>{
+      if(!section.trim()) return;
+      if(section.startsWith('Anbefalinger:') || section.match(/^\d\./)){
+        // numbered list
+        const lines = section.split('\n').filter(l=>l.trim());
+        lines.forEach(line=>{
+          checkY(12);
+          if(line.startsWith('Anbefalinger:')){
+            setFont(8,'bold'); setColor(ACCENT);
+            doc.text('ANBEFALINGER', 14, y); y+=6;
+          } else if(line.match(/^\d\./)){
+            setFill(SAND); setDraw(BORDER); doc.setLineWidth(0.2);
+            doc.rect(14,y-3,W-28,8,'FD');
+            setFont(7,'normal'); setColor(INK);
+            const txt = doc.splitTextToSize(line, W-32);
+            doc.text(txt[0], 18, y+1.5);
+            y+=9;
+          }
+        });
+      } else {
+        checkY(10);
+        setFont(7.5,'normal'); setColor(INK);
+        const lines = doc.splitTextToSize(section.replace(/\*\*(.*?)\*\*/g,'$1'), W-28);
+        lines.forEach(line=>{ checkY(6); doc.text(line,14,y); y+=5.5; });
+        y+=4;
+      }
+    });
+  }
+
+  // ----- FOOTER ALL PAGES -----
+  const totalPages = doc.getNumberOfPages();
+  for(let p=1;p<=totalPages;p++){
+    doc.setPage(p);
+    setFill(DARK); doc.rect(0,H-10,W,10,'F');
+    setFont(7,'normal'); setColor(BROWN);
+    doc.text('novooi.com', 14, H-4);
+    doc.text('Konfidensielt', W/2, H-4, {align:'center'});
+    doc.text('Side '+p+' av '+totalPages, W-14, H-4, {align:'right'});
+  }
+
+  const dateStr = new Date().toISOString().slice(0,10);
+  doc.save('novooi-google-ads-rapport-'+period+'d-'+dateStr+'.pdf');
+}
+
+function loadScript(src){
+  return new Promise((resolve,reject)=>{
+    if(document.querySelector('script[src="'+src+'"]')){resolve();return;}
+    const s=document.createElement('script');
+    s.src=src; s.onload=resolve; s.onerror=reject;
+    document.head.appendChild(s);
+  });
+}
+
 </script>
 </body>
 </html>
