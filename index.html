@@ -696,7 +696,7 @@ async function fetchAll(){
   setTopStatus('henter data...','');
   try{
     const [c,ag,a,k]=await Promise.all([
-      wPost('/ads/query',{query:`SELECT campaign.name,campaign.status,campaign.advertising_channel_type,metrics.impressions,metrics.clicks,metrics.cost_micros,metrics.conversions,metrics.ctr,metrics.average_cpc,metrics.conversion_rate FROM campaign WHERE segments.date DURING ${period} ORDER BY metrics.cost_micros DESC LIMIT 50`}),
+      wPost('/ads/query',{query:`SELECT campaign.name,campaign.status,campaign.advertising_channel_type,metrics.impressions,metrics.clicks,metrics.cost_micros,metrics.conversions,metrics.ctr FROM campaign WHERE segments.date DURING ${period} ORDER BY metrics.cost_micros DESC LIMIT 50`}),
       wPost('/ads/query',{query:`SELECT ad_group.name,ad_group.status,campaign.name,metrics.impressions,metrics.clicks,metrics.cost_micros,metrics.conversions,metrics.ctr FROM ad_group WHERE segments.date DURING ${period} ORDER BY metrics.cost_micros DESC LIMIT 50`}),
       wPost('/ads/query',{query:`SELECT ad_group_ad.ad.responsive_search_ad.headlines,ad_group_ad.status,campaign.name,ad_group.name,metrics.impressions,metrics.clicks,metrics.cost_micros,metrics.conversions,metrics.ctr FROM ad_group_ad WHERE segments.date DURING ${period} ORDER BY metrics.impressions DESC LIMIT 50`}),
       wPost('/ads/query',{query:`SELECT ad_group_criterion.keyword.text,ad_group_criterion.keyword.match_type,campaign.name,metrics.impressions,metrics.clicks,metrics.cost_micros,metrics.conversions,metrics.ctr,metrics.average_cpc,ad_group_criterion.quality_info.quality_score FROM keyword_view WHERE segments.date DURING ${period} ORDER BY metrics.cost_micros DESC LIMIT 100`})
