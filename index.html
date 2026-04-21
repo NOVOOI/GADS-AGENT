@@ -248,7 +248,7 @@ td{padding:9px 12px}
 
 <div class="top-bar">
   <label>Worker URL</label>
-  <input type="text" id="worker-url" placeholder="https://novooi-ads.marcus-3aa.workers.dev" oninput="onWorkerInput()">
+  <input type="text" id="worker-url" placeholder="https://novooi-ads.marcus-3aa.workers.dev" oninput="onWorkerInput()" value="https://novooi-ads.marcus-3aa.workers.dev">
   <select class="period-sel" id="period-sel" onchange="onPeriodChange()">
     <option value="LAST_7_DAYS">Siste 7 dager</option>
     <option value="LAST_14_DAYS">Siste 14 dager</option>
@@ -259,7 +259,7 @@ td{padding:9px 12px}
     <button class="btn btn-dark btn-sm" onclick="loadDemo()">Demo-data</button>
     <button class="btn btn-outline btn-sm" onclick="fetchAll()">Hent live data</button>
   </div>
-  <span class="top-bar-status" id="top-status">— demo-modus</span>
+  <span class="top-bar-status" id="top-status">— klar</span>
 </div>
 
 <nav>
@@ -471,6 +471,7 @@ td{padding:9px 12px}
       <div class="btn-row">
         <button class="btn btn-dark" id="daily-test-btn" onclick="testDailyAlert()">Kjør daglig analyse nå</button>
         <button class="btn btn-outline" id="demo-alert-btn" onclick="testDemoAlert()">Send test-varsling (demo-data)</button>
+        <button class="btn btn-outline" id="monthly-test-btn" onclick="testMonthlyReport()">Send månedlig rapport nå</button>
       </div>
       <div id="daily-test-status" class="status"></div>
     </div>
@@ -567,8 +568,11 @@ function checkGate(){
 }
 
 function init(){
-  const wUrl = sessionStorage.getItem('novooi_worker');
-  if(wUrl) { document.getElementById('worker-url').value=wUrl; setTopStatus('klar','green'); }
+  const defaultUrl = 'https://novooi-ads.marcus-3aa.workers.dev';
+  const wUrl = sessionStorage.getItem('novooi_worker') || defaultUrl;
+  document.getElementById('worker-url').value = wUrl;
+  sessionStorage.setItem('novooi_worker', wUrl);
+  setTopStatus('klar','green');
   const seen = sessionStorage.getItem('novooi_ob_seen');
   if(!seen) { document.getElementById('onboarding').classList.remove('hidden'); }
   loadDemo();
@@ -1411,27 +1415,47 @@ async function testDemoAlert(){
 }
 
 
+async function testMonthlyReport(){
+  const url = getWorker();
+  const btn = document.getElementById('monthly-test-btn');
+  const statusEl = document.getElementById('daily-test-status');
+  if(!url){ statusEl.className='status on err'; statusEl.textContent='Lim inn Worker URL øverst først'; return; }
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Genererer månedlig rapport...';
+  statusEl.className = 'status on';
+  statusEl.textContent = 'Henter 30-dagers data og genererer wins & losses med Claude...';
+  try {
+    const r = await fetch(url+'/send-monthly-report', { headers: { 'X-App-Password': PW } });
+    const d = await r.json();
+    if(d.error) throw new Error(d.error);
+    statusEl.className = 'status on ok';
+    statusEl.textContent = 'Månedlig rapport sendt til Discord!';
+    logAction('Månedlig rapport sendt manuelt');
+  } catch(e) {
+    statusEl.className = 'status on err';
+    statusEl.textContent = 'Feil: ' + e.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Send månedlig rapport nå';
+  }
+}
+
+
 async function testDailyAlert(){
   const url = getWorker();
   const btn = document.getElementById('daily-test-btn');
   const statusEl = document.getElementById('daily-test-status');
-  if(!url){
-    statusEl.className='status on err';
-    statusEl.textContent='Lim inn Worker URL i feltet øverst først';
-    return;
-  }
+  if(!url){ statusEl.className='status on err'; statusEl.textContent='Lim inn Worker URL øverst først'; return; }
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Kjører analyse...';
   statusEl.className = 'status on';
   statusEl.textContent = 'Henter Google Ads-data og analyserer med Claude...';
   try {
-    const r = await fetch(url+'/run-daily', {
-      headers: { 'X-App-Password': PW }
-    });
+    const r = await fetch(url+'/run-daily', { headers: { 'X-App-Password': PW } });
     const d = await r.json();
     if(d.error) throw new Error(d.error);
     statusEl.className = 'status on ok';
-    statusEl.textContent = (d.message || 'Analyse fullført') + ' — sjekk innboksen hvis Claude fant noe å varsle om';
+    statusEl.textContent = (d.message || 'Analyse fullført') + ' — sjekk Discord hvis Claude fant noe å varsle om';
     logAction('Daglig varsling testet manuelt');
   } catch(e) {
     statusEl.className = 'status on err';
