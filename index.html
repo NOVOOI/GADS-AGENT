@@ -541,7 +541,13 @@ td{padding:9px 12px}
 <div id="main-status" class="status" style="position:fixed;bottom:20px;right:20px;max-width:380px;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.15)"></div>
 
 <script>
-const PW = 'Novooi26';
+const PW_HASH = 'dcd458ef95a356fe810c809b4ace850962a2f35b4bd6a23f664c4ef64de40df5';
+let sessionPW = '';
+
+async function hashInput(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
 let D = {campaigns:[],adGroups:[],ads:[],keywords:[]};
 let negKwList = [];
 let obStep = 0;
@@ -550,16 +556,17 @@ let sortState = {};
 let chatHistory = [];
 
 // ----- GATE -----
-function checkGate(){
+async function checkGate(){
   const input = document.getElementById('gate-pw');
   const errEl = document.getElementById('gate-err');
   if(!input) return;
   const val = input.value;
-  if(val === PW){
+  if(val === '') { errEl.textContent = 'Skriv inn passord'; return; }
+  const hash = await hashInput(val);
+  if(hash === PW_HASH){
+    sessionPW = val;
     document.getElementById('gate').classList.add('hidden');
     try { init(); } catch(e) { console.error('Init error:', e); }
-  } else if(val === '') {
-    errEl.textContent = 'Skriv inn passord';
   } else {
     errEl.textContent = 'Feil passord';
     input.value = '';
@@ -619,7 +626,7 @@ function setTopStatus(msg,color){
 async function wPost(path,body){
   const url=getWorker();
   if(!url) throw new Error('Lim inn Worker URL');
-  const r=await fetch(url+path,{method:'POST',headers:{'Content-Type':'application/json','X-App-Password':PW},body:JSON.stringify(body)});
+  const r=await fetch(url+path,{method:'POST',headers:{'Content-Type':'application/json','X-App-Password':sessionPW},body:JSON.stringify(body)});
   const d=await r.json();
   if(d.error) throw new Error(d.error);
   return d;
@@ -1397,7 +1404,7 @@ async function testDemoAlert(){
   try {
     const r = await fetch(url+'/send-demo-alert', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-App-Password': PW },
+      headers: { 'Content-Type': 'application/json', 'X-App-Password': sessionPW },
       body: JSON.stringify({ data: getDataSummary() })
     });
     const d = await r.json();
@@ -1425,7 +1432,7 @@ async function testMonthlyReport(){
   statusEl.className = 'status on';
   statusEl.textContent = 'Henter 30-dagers data og genererer wins & losses med Claude...';
   try {
-    const r = await fetch(url+'/send-monthly-report', { headers: { 'X-App-Password': PW } });
+    const r = await fetch(url+'/send-monthly-report', { headers: { 'X-App-Password': sessionPW } });
     const d = await r.json();
     if(d.error) throw new Error(d.error);
     statusEl.className = 'status on ok';
@@ -1451,7 +1458,7 @@ async function testDailyAlert(){
   statusEl.className = 'status on';
   statusEl.textContent = 'Henter Google Ads-data og analyserer med Claude...';
   try {
-    const r = await fetch(url+'/run-daily', { headers: { 'X-App-Password': PW } });
+    const r = await fetch(url+'/run-daily', { headers: { 'X-App-Password': sessionPW } });
     const d = await r.json();
     if(d.error) throw new Error(d.error);
     statusEl.className = 'status on ok';
