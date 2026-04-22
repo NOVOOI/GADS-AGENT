@@ -925,72 +925,39 @@ async function generateCampaignStructure(){
 
   try {
     const result = await wPost('/ai', {
-      system: `Du er Google Ads-strateg for Novooi.com — en norsk premium nettbutikk for møbler og interiør som selger produkter fra over 100 norske designere og merkevarer.
+      system: `Du er Google Ads-strateg for Novooi.com — norsk premium nettbutikk for møbler og interiør fra 100+ norske designere.
 
-Svar KUN med dette JSON-formatet, ingen annen tekst:
-{
-  "totalBudgetNote": "kort setning om budsjettbruk og omfordeling (maks 20 ord)",
-  "campaigns": [
-    {
-      "name": "Kampanjenavn",
-      "type": "SEARCH|PMAX|DISPLAY",
-      "budget": "kr XXX/mnd",
-      "budgetRationale": "kort begrunnelse for budsjett basert på eksisterende forbruk",
-      "description": "2 setninger om hva kampanjen skal oppnå",
-      "adGroups": [
-        {
-          "name": "Annonsegruppenavn",
-          "description": "hva denne gruppen dekker",
-          "keywords": [
-            {"text": "søkeord her", "match": "EXACT|PHRASE|BROAD"},
-            {"text": "søkeord to", "match": "PHRASE"}
-          ],
-          "products": ["Produktnavn 1", "Produktnavn 2"],
-          "adHeadlines": ["Overskrift 1", "Overskrift 2", "Overskrift 3"],
-          "adDescriptions": ["Beskrivelse 1 maks 90 tegn", "Beskrivelse 2 maks 90 tegn"]
-        }
-      ]
-    }
-  ]
-}
+VIKTIG: Svar KUN med gyldig JSON. Ingen tekst utenfor JSON. Ingen markdown. Bruk kun enkle anførselstegn i eksempler, aldri doble inne i JSON-strenger.
 
-Viktige regler:
-- Budsjett skal baseres på eksisterende forbruk — ikke foreslå mer enn 20% økning totalt
-- Foreslå 3-5 kampanjer
-- 2-4 annonsegrupper per kampanje
-- 4-8 søkeord per annonsegruppe, mix av match-typer
-- Produkter skal være ekte norske interiørprodukter (sofaer, bord, stoler, belysning, tepper osv)
-- Søkeord på norsk OG engelsk der det er relevant for EU-kampanjer
-- Bruk norsk for alt annet`,
+Format:
+{"totalBudgetNote":"kort setning om budsjett","campaigns":[{"name":"Navn","type":"SEARCH","budget":"kr X/mnd","budgetRationale":"kort begrunnelse","description":"2 setninger","adGroups":[{"name":"Gruppenavn","description":"hva gruppen dekker","keywords":[{"text":"søkeord","match":"EXACT"}],"products":["Produkt 1"],"adHeadlines":["Overskrift 1","Overskrift 2"],"adDescriptions":["Beskrivelse maks 90 tegn"]}]}]}
+
+Regler:
+- Basér budsjett på eksisterende forbruk, maks 20% endring totalt
+- 3-4 kampanjer, 2-3 annonsegrupper per kampanje, 4-6 søkeord per gruppe
+- Søkeord på norsk (og engelsk for EU)
+- Produkter: sofaer, bord, stoler, belysning, tepper, hyller — ekte Novooi-sortiment
+- Hold alle tekstverdier korte for å unngå JSON-feil`,
       messages: [{
         role: 'user',
-        content: `Nåværende kampanjer (totalt forbruk: kr ${totalBudget.toFixed(0)}/mnd):
-${JSON.stringify(campSummary, null, 2)}
-
-Nåværende topp-søkeord:
-${JSON.stringify(kwSummary, null, 2)}
-
-Lag en komplett, optimalisert kampanjestruktur for Novooi basert på dette budsjettet.`
+        content: `Budsjett: kr ${totalBudget.toFixed(0)}/mnd\nKampanjer: ${JSON.stringify(campSummary.slice(0,6))}\nSøkeord: ${JSON.stringify(kwSummary.slice(0,15))}`
       }]
     });
 
     let parsed;
     try {
-      // Try multiple parsing strategies
       let raw = result.text || '';
-      // Strip markdown code blocks
       raw = raw.replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```\s*$/,'').trim();
-      // Find first { and last }
       const firstBrace = raw.indexOf('{');
       const lastBrace  = raw.lastIndexOf('}');
-      if(firstBrace !== -1 && lastBrace !== -1){
-        raw = raw.slice(firstBrace, lastBrace + 1);
-      }
+      if(firstBrace !== -1 && lastBrace !== -1) raw = raw.slice(firstBrace, lastBrace + 1);
+      // Fix common JSON issues: trailing commas
+      raw = raw.replace(/,\s*([}\]])/g, '$1');
       parsed = JSON.parse(raw);
     } catch(e) {
-      console.error('Parse error:', e, result.text?.slice(0,300));
+      console.error('Parse error:', e.message, '\nRaw snippet:', (result.text||'').slice(0,400));
       statusEl.className = 'status on err';
-      statusEl.textContent = 'Klarte ikke lese svaret — prøv igjen. Feil: ' + e.message;
+      statusEl.textContent = 'JSON-feil: ' + e.message.slice(0,80) + ' — prøv igjen';
       btn.disabled = false; btn.textContent = 'Generer forslag';
       return;
     }
