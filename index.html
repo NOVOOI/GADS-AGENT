@@ -194,6 +194,29 @@ td{padding:9px 12px}
 .roas-val{font-size:20px;font-weight:300;color:var(--dark)}
 .roas-sub{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--taupe)}
 
+/* Historikk */
+.hist-chart-wrap{margin-bottom:28px}
+.hist-chart-title{font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--brown);margin-bottom:12px}
+
+/* Strukturkart */
+.camp-node{border:1px solid var(--border);background:var(--warm);margin-bottom:12px;border-radius:4px;overflow:hidden}
+.camp-header{background:var(--dark);color:var(--cream);padding:10px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
+.camp-name{font-size:14px;font-weight:500}
+.camp-meta{font-family:'Courier Prime',monospace;font-size:10px;color:var(--taupe)}
+.camp-toggle{font-family:'Courier Prime',monospace;font-size:12px;color:var(--taupe);margin-left:12px}
+.ag-list{padding:8px 16px;background:var(--cream);display:none}
+.ag-list.open{display:block}
+.ag-node{border:1px solid var(--border);background:var(--warm);margin:6px 0;border-radius:2px}
+.ag-header{padding:8px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-bottom:1px solid var(--border)}
+.ag-name{font-size:13px;font-weight:500;color:var(--ink)}
+.ag-meta{font-family:'Courier Prime',monospace;font-size:10px;color:var(--taupe)}
+.kw-list{padding:6px 14px;background:var(--cream);display:none}
+.kw-list.open{display:block}
+.kw-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px}
+.kw-row:last-child{border-bottom:none}
+.kw-text{flex:1;font-weight:500;color:var(--ink)}
+.kw-badge{font-family:'Courier Prime',monospace;font-size:9px;padding:1px 6px;border:1px solid var(--border);color:var(--brown)}
+
 /* Analysis results */
 .analysis-section{margin-bottom:28px}
 .analysis-section:last-child{margin-bottom:0}
@@ -298,6 +321,8 @@ td{padding:9px 12px}
   <button class="nav-btn" onclick="showPage('annonser',this)">Annonser</button>
   <button class="nav-btn" onclick="showPage('negativeord',this)">Negative ord</button>
   <button class="nav-btn" onclick="showPage('sammenlign',this)">Sammenlign</button>
+  <button class="nav-btn" onclick="showPage('historikk',this)">Historikk</button>
+  <button class="nav-btn" onclick="showPage('strukturkart',this)">Strukturkart</button>
   <button class="nav-btn" onclick="showPage('ai',this)">AI-verktøy</button>
   <button class="nav-btn" onclick="showPage('logg',this)">Logg</button>
   <button class="nav-btn" onclick="showPage('rapport',this)">Rapport</button>
@@ -484,6 +509,40 @@ td{padding:9px 12px}
         <button class="btn btn-dark btn-sm" style="margin-top:16px" onclick="runComparison()">Sammenlign</button>
       </div>
       <div id="compare-content"></div>
+    </div>
+  </div>
+
+  <!-- HISTORIKK -->
+  <div class="section-page" id="page-historikk">
+    <div class="block">
+      <div class="block-title">Historiske trender
+        <div class="btn-row">
+          <button class="btn btn-dark btn-sm" onclick="fetchHistory()">Hent historikk</button>
+          <button class="btn btn-outline btn-sm" onclick="saveSnapshotNow()">Lagre snapshot nå</button>
+        </div>
+      </div>
+      <p style="font-size:15px;margin-bottom:16px;color:var(--brown)">Ukentlige snapshots lagres automatisk i Cloudflare KV. Klikk "Lagre snapshot nå" for å starte første lagring — deretter skjer det automatisk daglig.</p>
+      <div id="hist-status" class="status"></div>
+      <div id="hist-charts" style="margin-top:20px"></div>
+    </div>
+    <div class="block" id="hist-table-block" style="display:none">
+      <div class="block-title">Alle snapshots</div>
+      <div class="table-wrap"><table id="hist-tbl"></table></div>
+    </div>
+  </div>
+
+  <!-- STRUKTURKART -->
+  <div class="section-page" id="page-strukturkart">
+    <div class="block">
+      <div class="block-title">Annonsegruppe-strukturkart
+        <button class="btn btn-dark btn-sm" id="struct-btn" onclick="fetchStructure()">Hent struktur</button>
+      </div>
+      <p style="font-size:15px;margin-bottom:16px;color:var(--brown)">Visuell oversikt over kampanje-hierarkiet: kampanjer → annonsegrupper → søkeord. Fargekodet etter ytelse og QS.</p>
+      <div id="struct-status" class="status"></div>
+      <div id="struct-search" style="margin-bottom:16px;display:none">
+        <input type="text" class="table-search" placeholder="Søk i strukturen..." oninput="filterStruct(this.value)" style="width:280px">
+      </div>
+      <div id="struct-content"></div>
     </div>
   </div>
 
@@ -989,6 +1048,193 @@ async function fetchSearchTerms(){
   }finally{
     btn.disabled=false;btn.textContent='Hent søketermer';
   }
+}
+
+// ----- HISTORIKK -----
+async function saveSnapshotNow(){
+  const url=getWorker();
+  const statusEl=document.getElementById('hist-status');
+  if(!url){statusEl.className='status on err';statusEl.textContent='Worker URL mangler';return;}
+  statusEl.className='status on';statusEl.textContent='Lagrer snapshot...';
+  try{
+    const r=await fetch(url+'/save-snapshot',{headers:{'X-App-Password':sessionPW}});
+    const d=await r.json();
+    if(d.error) throw new Error(d.error);
+    statusEl.className='status on ok';statusEl.textContent='Snapshot lagret — uke '+d.week+' (kr '+Math.round(d.totalSpend)+' forbruk)';
+    logAction('Snapshot lagret: '+d.week);
+    fetchHistory();
+  }catch(e){
+    statusEl.className='status on err';statusEl.textContent='Feil: '+e.message;
+  }
+}
+
+async function fetchHistory(){
+  const url=getWorker();
+  const statusEl=document.getElementById('hist-status');
+  if(!url){statusEl.className='status on err';statusEl.textContent='Worker URL mangler';return;}
+  statusEl.className='status on';statusEl.textContent='Henter historikk fra KV...';
+  try{
+    const r=await fetch(url+'/get-history',{headers:{'X-App-Password':sessionPW}});
+    const d=await r.json();
+    if(d.error) throw new Error(d.error);
+    if(!d.snapshots||!d.snapshots.length){statusEl.className='status on err';statusEl.textContent='Ingen historikk ennå — klikk "Lagre snapshot nå" for å starte';return;}
+    statusEl.className='status on ok';statusEl.textContent=d.snapshots.length+' uker med data hentet';
+    renderHistoryCharts(d.snapshots);
+    renderHistoryTable(d.snapshots);
+    logAction('Historikk hentet: '+d.snapshots.length+' snapshots');
+  }catch(e){
+    statusEl.className='status on err';statusEl.textContent='Feil: '+e.message;
+  }
+}
+
+function renderHistoryCharts(snaps){
+  const el=document.getElementById('hist-charts');
+  const weeks=snaps.map(s=>s.week.replace(/\d{4}-/,''));
+  const charts=[
+    {title:'Forbruk per uke (kr)',vals:snaps.map(s=>s.totalSpend),color:'var(--accent)'},
+    {title:'CTR per uke (%)',vals:snaps.map(s=>+(s.avgCtr*100).toFixed(2)),color:'var(--green)'},
+    {title:'Konverteringer per uke',vals:snaps.map(s=>+s.totalConv.toFixed(1)),color:'var(--brown)'},
+    {title:'CPA per uke (kr)',vals:snaps.map(s=>+s.cpa.toFixed(0)),color:'var(--orange)'},
+  ];
+  el.innerHTML=charts.map(ch=>{
+    const max=Math.max(...ch.vals,1);
+    const min=Math.min(...ch.vals,0);
+    const W=600,H=120,padL=50,padB=28,padT=10,padR=10;
+    const xStep=(W-padL-padR)/(Math.max(weeks.length-1,1));
+    const yScale=(H-padT-padB)/(max-min||1);
+    const pts=ch.vals.map((v,i)=>{
+      const x=padL+i*xStep;
+      const y=H-padB-(v-min)*yScale;
+      return {x,y,v};
+    });
+    const path=pts.map((p,i)=>(i===0?'M':'L')+p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ');
+    const areaPath=path+` L${pts[pts.length-1].x.toFixed(1)},${(H-padB).toFixed(1)} L${padL},${(H-padB).toFixed(1)} Z`;
+    const labels=weeks.map((w,i)=>{
+      const x=padL+i*xStep;
+      if(weeks.length>8&&i%2!==0) return '';
+      return `<text x="${x.toFixed(1)}" y="${H-8}" text-anchor="middle" class="hist-label">${w}</text>`;
+    }).join('');
+    const dots=pts.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3" fill="${ch.color}" stroke="var(--warm)" stroke-width="1.5"><title>${p.v}</title></circle>`).join('');
+    return `<div class="hist-chart-wrap">
+      <div class="hist-chart-title">${ch.title}</div>
+      <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px">
+        <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H-padB}" stroke="var(--border)" stroke-width="0.5"/>
+        <line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="var(--border)" stroke-width="0.5"/>
+        <path d="${areaPath}" fill="${ch.color}" opacity="0.08"/>
+        <path d="${path}" fill="none" stroke="${ch.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="${padL-4}" y="${padT+8}" text-anchor="end" class="hist-label">${max.toFixed(0)}</text>
+        <text x="${padL-4}" y="${H-padB}" text-anchor="end" class="hist-label">${min.toFixed(0)}</text>
+        ${labels}
+        ${dots}
+      </svg>
+    </div>`;
+  }).join('');
+}
+
+function renderHistoryTable(snaps){
+  const block=document.getElementById('hist-table-block');
+  block.style.display='block';
+  const tbl=document.getElementById('hist-tbl');
+  tbl.innerHTML='<thead><tr><th>Uke</th><th>Dato</th><th>Forbruk</th><th>Klikk</th><th>Konv.</th><th>CTR</th><th>CPA</th></tr></thead><tbody>'+
+    [...snaps].reverse().map(s=>`<tr>
+      <td class="mono">${s.week}</td>
+      <td class="mono" style="font-size:11px">${s.date}</td>
+      <td class="mono">${kr(s.totalSpend*1e6)}</td>
+      <td class="mono">${fmt(s.totalClicks)}</td>
+      <td class="mono">${s.totalConv.toFixed(1)}</td>
+      <td class="mono">${pct(s.avgCtr)}</td>
+      <td class="mono">${s.cpa>0?kr(s.cpa*1e6):'—'}</td>
+    </tr>`).join('')+'</tbody>';
+}
+
+// ----- STRUKTURKART -----
+let structData = null;
+async function fetchStructure(){
+  const url=getWorker();
+  const btn=document.getElementById('struct-btn');
+  const statusEl=document.getElementById('struct-status');
+  if(!url){statusEl.className='status on err';statusEl.textContent='Worker URL mangler';return;}
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Henter...';
+  statusEl.className='status on';statusEl.textContent='Henter struktur fra Google Ads...';
+  try{
+    const r=await fetch(url+'/get-structure',{headers:{'X-App-Password':sessionPW}});
+    const d=await r.json();
+    if(d.error) throw new Error(d.error);
+    structData=d;
+    renderStructure(d,'');
+    document.getElementById('struct-search').style.display='block';
+    statusEl.className='status on ok';statusEl.textContent=d.campaigns.length+' kampanjer, '+d.adGroups.length+' annonsegrupper, '+d.keywords.length+' søkeord';
+    logAction('Strukturkart hentet');
+  }catch(e){
+    statusEl.className='status on err';statusEl.textContent='Feil: '+e.message;
+  }finally{
+    btn.disabled=false;btn.textContent='Hent struktur';
+  }
+}
+
+function renderStructure(d, filter){
+  const el=document.getElementById('struct-content');
+  const f=filter.toLowerCase();
+  const statusColors={ENABLED:'var(--green)',PAUSED:'var(--orange)',REMOVED:'var(--red)'};
+  const matchLabels={EXACT:'Eksakt',PHRASE:'Frase',BROAD:'Bred'};
+  el.innerHTML=d.campaigns.map(camp=>{
+    const ags=d.adGroups.filter(ag=>ag.campaignId===camp.id);
+    const campMatch=!f||camp.name.toLowerCase().includes(f);
+    const anyMatch=campMatch||ags.some(ag=>ag.name.toLowerCase().includes(f)||d.keywords.filter(k=>k.adGroupId===ag.id).some(k=>k.text&&k.text.toLowerCase().includes(f)));
+    if(!anyMatch) return '';
+    const statusDot=`<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${statusColors[camp.status]||'var(--taupe)'};margin-right:6px"></span>`;
+    const agHtml=ags.map(ag=>{
+      const agMatch=!f||ag.name.toLowerCase().includes(f)||campMatch;
+      const kws=d.keywords.filter(k=>k.adGroupId===ag.id);
+      const kwMatch=kws.some(k=>k.text&&k.text.toLowerCase().includes(f));
+      if(!agMatch&&!kwMatch) return '';
+      const kwHtml=kws.map(k=>{
+        if(f&&!k.text?.toLowerCase().includes(f)&&!agMatch&&!campMatch) return '';
+        const qsColor=k.qs>=8?'var(--green)':k.qs>=6?'var(--orange)':k.qs>0?'var(--red)':'var(--taupe)';
+        return `<div class="kw-row">
+          <div class="kw-text">${k.text||'—'}</div>
+          <span class="kw-badge">${matchLabels[k.matchType]||k.matchType||'—'}</span>
+          ${k.qs>0?`<span class="mono" style="color:${qsColor};font-size:10px">QS ${k.qs}</span>`:''}
+          <span class="mono" style="color:var(--taupe);font-size:10px">${fmt(k.clicks)} klikk</span>
+        </div>`;
+      }).join('');
+      const agStatusDot=`<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${statusColors[ag.status]||'var(--taupe)'};margin-right:6px"></span>`;
+      return `<div class="ag-node">
+        <div class="ag-header" onclick="toggleNode(this)">
+          <div class="ag-name">${agStatusDot}${ag.name}</div>
+          <div class="ag-meta">${fmt(ag.clicks)} klikk &middot; kr ${Math.round(ag.spend).toLocaleString('nb-NO')} &middot; ${kws.length} søkeord</div>
+        </div>
+        <div class="kw-list${(f&&kwMatch)||!f?' open':''}">${kwHtml||'<div style="font-size:12px;color:var(--taupe);padding:8px 0">Ingen søkeord</div>'}</div>
+      </div>`;
+    }).join('');
+    return `<div class="camp-node">
+      <div class="camp-header" onclick="toggleCamp(this)">
+        <div style="display:flex;align-items:center">
+          ${statusDot}
+          <span class="camp-name">${camp.name}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <span class="camp-meta">kr ${Math.round(camp.spend).toLocaleString('nb-NO')} &middot; ${camp.conversions.toFixed(1)} konv. &middot; ${ags.length} grupper</span>
+          <span class="camp-toggle">▾</span>
+        </div>
+      </div>
+      <div class="ag-list${f?' open':' open'}">${agHtml||'<div style="padding:10px;font-size:13px;color:var(--taupe)">Ingen annonsegrupper</div>'}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleCamp(header){
+  const list=header.nextElementSibling;
+  const toggle=header.querySelector('.camp-toggle');
+  list.classList.toggle('open');
+  toggle.textContent=list.classList.contains('open')?'▾':'▸';
+}
+function toggleNode(header){
+  const list=header.nextElementSibling;
+  list.classList.toggle('open');
+}
+function filterStruct(val){
+  if(structData) renderStructure(structData,val);
 }
 
 // ----- NOTIFICATIONS -----
