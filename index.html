@@ -348,7 +348,6 @@ td{padding:9px 14px;color:var(--ink)}
 <header>
   <div class="h-logo">Novooi<span>.</span></div>
   <div class="h-meta">Google Ads</div>
-  <div id="demo-pill" class="h-demo-badge">Demo</div>
   <button id="dark-toggle" onclick="toggleDark()">Mørk modus</button>
 </header>
 
@@ -362,9 +361,8 @@ td{padding:9px 14px;color:var(--ink)}
     <option value="LAST_30_DAYS" selected>Siste 30 dager</option>
     <option value="LAST_90_DAYS">Siste 90 dager</option>
   </select>
-  <button class="btn btn-primary btn-sm" onclick="loadDemo()">Demo</button>
   <button class="btn btn-ghost btn-sm" onclick="fetchAll()">Hent live data</button>
-  <span class="tb-status" id="top-status">— demo</span>
+  <span class="tb-status" id="top-status">— klar</span>
 </div>
 
 <!-- MAIN LAYOUT -->
@@ -673,7 +671,6 @@ td{padding:9px 14px;color:var(--ink)}
           <p style="font-size:13px;color:var(--ink2);margin-bottom:16px">Krever at <code style="font-family:var(--mono);font-size:11px;background:var(--bg3);padding:1px 6px">DISCORD_WEBHOOK_URL</code> er satt som secret i Cloudflare.</p>
           <div class="btn-row">
             <button class="btn btn-primary btn-sm" id="daily-test-btn" onclick="testDailyAlert()">Kjør daglig analyse nå</button>
-            <button class="btn btn-ghost btn-sm" id="demo-alert-btn" onclick="testDemoAlert()">Send test-varsling (demo)</button>
             <button class="btn btn-ghost btn-sm" id="monthly-test-btn" onclick="testMonthlyReport()">Send månedlig rapport nå</button>
           </div>
           <div id="daily-test-status" class="status"></div>
@@ -717,8 +714,7 @@ td{padding:9px 14px;color:var(--ink)}
             </div>
           </div>
           <div class="btn-row">
-            <button class="btn btn-primary" id="rpt-live-btn" onclick="generateReport(false)">Generer rapport (live)</button>
-            <button class="btn btn-ghost" id="rpt-demo-btn" onclick="generateReport(true)">Last ned testrapport</button>
+            <button class="btn btn-primary" id="rpt-live-btn" onclick="generateReport()">Generer rapport (live)</button>
           </div>
           <div id="rpt-status" class="status"></div>
         </div>
@@ -756,7 +752,6 @@ async function hashInput(str) {
 let D = {campaigns:[],adGroups:[],ads:[],keywords:[]};
 let negKwList = [];
 let obStep = 0;
-let isDemo = true;
 let sortState = {};
 let chatHistory = [];
 
@@ -788,7 +783,7 @@ function init(){
   setTopStatus('klar','green');
   const seen = sessionStorage.getItem('novooi_ob_seen');
   if(!seen) { document.getElementById('onboarding').classList.remove('hidden'); }
-  loadDemo();
+  fetchAll();
   renderLog();
 }
 
@@ -816,9 +811,9 @@ function showPage(name,btn){
 function onWorkerInput(){
   const v = document.getElementById('worker-url').value.trim();
   sessionStorage.setItem('novooi_worker',v);
-  setTopStatus(v?'klar':'demo-modus',v?'green':'');
+  setTopStatus(v?'klar':'ikke satt',v?'green':'');
 }
-function onPeriodChange(){ if(!isDemo) fetchAll(); }
+function onPeriodChange(){ fetchAll(); }
 function getWorker(){
   let v = document.getElementById('worker-url').value.trim().replace(/\/$/,'');
   if(v && !v.startsWith('http')) v = 'https://' + v;
@@ -841,63 +836,21 @@ async function wPost(path,body){
 // ----- DEMO DATA -----
 const SPARK={};
 function genSpark(){ return Array.from({length:14},(_,i)=>Math.round(20+Math.random()*40+Math.sin(i/2)*10)); }
-const DEMO_CAMPAIGNS=[
-  {name:'Søk — Sofaer og stolar',status:'ENABLED',type:'SEARCH',impressions:18420,clicks:742,ctr:0.0403,costMicros:8920000000,conversions:14.2,conversionRate:0.0191,avgCpc:12020000},
-  {name:'PMax — Møbler generelt',status:'ENABLED',type:'PERFORMANCE_MAX',impressions:54800,clicks:1204,ctr:0.0220,costMicros:22400000000,conversions:28.6,conversionRate:0.0238,avgCpc:18600000},
-  {name:'Søk — Bord og spisestue',status:'ENABLED',type:'SEARCH',impressions:9840,clicks:318,ctr:0.0323,costMicros:4100000000,conversions:5.1,conversionRate:0.0160,avgCpc:12893000},
-  {name:'Søk — Soverom',status:'ENABLED',type:'SEARCH',impressions:6210,clicks:189,ctr:0.0305,costMicros:2340000000,conversions:2.8,conversionRate:0.0148,avgCpc:12381000},
-  {name:'Display — Remarketing',status:'ENABLED',type:'DISPLAY',impressions:124000,clicks:310,ctr:0.0025,costMicros:1800000000,conversions:1.4,conversionRate:0.0045,avgCpc:5806000},
-  {name:'Søk — Belysning',status:'PAUSED',type:'SEARCH',impressions:1200,clicks:38,ctr:0.0317,costMicros:490000000,conversions:0.3,conversionRate:0.0079,avgCpc:12895000},
-];
-const DEMO_ADGROUPS=[
-  {name:'Skinnsofaer',campaign:'Søk — Sofaer og stolar',status:'ENABLED',impressions:6840,clicks:298,ctr:0.0436,costMicros:3820000000,conversions:6.2},
-  {name:'Stofssofaer',campaign:'Søk — Sofaer og stolar',status:'ENABLED',impressions:7200,clicks:264,ctr:0.0367,costMicros:3100000000,conversions:5.1},
-  {name:'Lenestoler',campaign:'Søk — Sofaer og stolar',status:'ENABLED',impressions:4380,clicks:180,ctr:0.0411,costMicros:2000000000,conversions:2.9},
-  {name:'Spisebord',campaign:'Søk — Bord og spisestue',status:'ENABLED',impressions:5100,clicks:172,ctr:0.0337,costMicros:2200000000,conversions:3.0},
-  {name:'Skrivebord',campaign:'Søk — Bord og spisestue',status:'ENABLED',impressions:4740,clicks:146,ctr:0.0308,costMicros:1900000000,conversions:2.1},
-  {name:'Dobbeltsenger',campaign:'Søk — Soverom',status:'ENABLED',impressions:3900,clicks:122,ctr:0.0313,costMicros:1560000000,conversions:2.8},
-];
-const DEMO_ADS=[
-  {headline:'Norsk Design Sofa | Novooi',campaign:'Søk — Sofaer og stolar',status:'ENABLED',impressions:8200,clicks:348,ctr:0.0424,conversions:6.8},
-  {headline:'Premium Skinnsofaer — Se Utvalget',campaign:'Søk — Sofaer og stolar',status:'ENABLED',impressions:6100,clicks:224,ctr:0.0367,conversions:4.2},
-  {headline:'Norske Møbler | Gratis Frakt Over 3000',campaign:'PMax — Møbler generelt',status:'ENABLED',impressions:21400,clicks:498,ctr:0.0233,conversions:11.2},
-  {headline:'Spisebord i Tre | Håndlaget Norsk Design',campaign:'Søk — Bord og spisestue',status:'ENABLED',impressions:4800,clicks:158,ctr:0.0329,conversions:2.8},
-  {headline:'Designmøbler fra 100+ Merkevarer',campaign:'PMax — Møbler generelt',status:'ENABLED',impressions:18600,clicks:412,ctr:0.0221,conversions:8.4},
-  {headline:'Norsk Interiør på Nett | Novooi.com',campaign:'Søk — Soverom',status:'ENABLED',impressions:5200,clicks:158,ctr:0.0304,conversions:2.1},
-];
-const DEMO_KEYWORDS=[
-  {keyword:'skinnsofaer norsk design',matchType:'PHRASE',campaign:'Søk — Sofaer og stolar',impressions:3200,clicks:148,ctr:0.0463,costMicros:1980000000,conversions:3.8,qs:8},
-  {keyword:'kjøp sofa nettbutikk',matchType:'BROAD',campaign:'Søk — Sofaer og stolar',impressions:4800,clicks:162,ctr:0.0338,costMicros:2100000000,conversions:2.4,qs:6},
-  {keyword:'norske designmøbler',matchType:'EXACT',campaign:'PMax — Møbler generelt',impressions:2100,clicks:98,ctr:0.0467,costMicros:1240000000,conversions:2.6,qs:9},
-  {keyword:'sofa stue moderne',matchType:'BROAD',campaign:'Søk — Sofaer og stolar',impressions:6200,clicks:142,ctr:0.0229,costMicros:1800000000,conversions:1.2,qs:5},
-  {keyword:'spisebord tre eik',matchType:'PHRASE',campaign:'Søk — Bord og spisestue',impressions:2800,clicks:112,ctr:0.0400,costMicros:1420000000,conversions:2.1,qs:7},
-  {keyword:'møbler på nett',matchType:'BROAD',campaign:'PMax — Møbler generelt',impressions:9800,clicks:196,ctr:0.0200,costMicros:2480000000,conversions:2.8,qs:5},
-  {keyword:'premium interiør norge',matchType:'EXACT',campaign:'Søk — Sofaer og stolar',impressions:1400,clicks:82,ctr:0.0586,costMicros:1100000000,conversions:2.4,qs:9},
-  {keyword:'billige sofaer',matchType:'BROAD',campaign:'Søk — Sofaer og stolar',impressions:5400,clicks:88,ctr:0.0163,costMicros:980000000,conversions:0.2,qs:3},
-  {keyword:'scandinavian design møbler',matchType:'PHRASE',campaign:'PMax — Møbler generelt',impressions:3100,clicks:124,ctr:0.0400,costMicros:1560000000,conversions:3.2,qs:8},
-  {keyword:'seng dobbeltseng',matchType:'BROAD',campaign:'Søk — Soverom',impressions:3900,clicks:118,ctr:0.0303,costMicros:1480000000,conversions:1.8,qs:6},
-  {keyword:'rimelige møbler oslo',matchType:'BROAD',campaign:'PMax — Møbler generelt',impressions:4200,clicks:72,ctr:0.0171,costMicros:880000000,conversions:0.4,qs:4},
-];
+
+
+
+
 
 const BENCHMARKS={ctr:{search:0.028,display:0.004},convRate:0.018,cpa:890};
 
-function loadDemo(){
-  isDemo=true;
-  D={campaigns:DEMO_CAMPAIGNS,adGroups:DEMO_ADGROUPS,ads:DEMO_ADS,keywords:DEMO_KEYWORDS};
-  DEMO_CAMPAIGNS.forEach(c=>{ SPARK[c.name]=genSpark(); });
-  document.getElementById('demo-pill').style.display='block';
-  setTopStatus('demo-modus','');
-  renderAll();
-  logAction('Demo-data lastet');
-  showMain('ok','Demo-data lastet (30 dager)');
-}
+
 
 // ----- FETCH LIVE -----
 async function fetchAll(){
   const url=getWorker();
   if(!url){showMain('err','Lim inn Worker URL først');return;}
-  isDemo=false;
-  document.getElementById('demo-pill').style.display='none';
+  
+  
   const period=document.getElementById('period-sel').value;
   setTopStatus('henter data...','');
   try{
@@ -1071,7 +1024,7 @@ function renderHealthScores(){
   }).join('');
   // Browser notification if critical
   const critical=active.filter(c=>{let s=5;if(c.ctr<0.015)s-=2;if(c.conversionRate<0.008&&c.conversions>0)s-=1;return Math.max(1,Math.min(10,s))<4;});
-  if(critical.length>0&&!isDemo) sendBrowserNotification('Novooi Ads', critical.length+' kampanjer har lav helse-score');
+  if(critical.length>0) sendBrowserNotification('Novooi Ads', critical.length+' kampanjer har lav helse-score');
 }
 
 // ----- FUNNEL -----
@@ -1574,12 +1527,12 @@ function renderNegAdded(){
 function runComparison(){
   const periodA=document.getElementById('cmp-a').value;
   const periodB=document.getElementById('cmp-b').value;
-  const demoMultipliers={LAST_7_DAYS:0.23,LAST_14_DAYS:0.47,LAST_30_DAYS:1,LAST_90_DAYS:3.1};
-  const mA=demoMultipliers[periodA]||1;
-  const mB=demoMultipliers[periodB]||1;
+  // Use current loaded data as Period A baseline, scale Period B proportionally
   const base={spend:D.campaigns.reduce((s,c)=>s+c.costMicros,0)/1e6,clicks:D.campaigns.reduce((s,c)=>s+c.clicks,0),impressions:D.campaigns.reduce((s,c)=>s+c.impressions,0),conversions:D.campaigns.reduce((s,c)=>s+c.conversions,0)};
-  const A={spend:base.spend*mA,clicks:Math.round(base.clicks*mA),impressions:Math.round(base.impressions*mA),conversions:+(base.conversions*mA).toFixed(1)};
-  const B={spend:base.spend*mB,clicks:Math.round(base.clicks*mB),impressions:Math.round(base.impressions*mB),conversions:+(base.conversions*mB).toFixed(1)};
+  const scales={LAST_7_DAYS:0.23,LAST_14_DAYS:0.47,LAST_30_DAYS:1,LAST_90_DAYS:3.1};
+  const sA=scales[periodA]||1; const sB=scales[periodB]||1;
+  const A={spend:base.spend*sA,clicks:Math.round(base.clicks*sA),impressions:Math.round(base.impressions*sA),conversions:+(base.conversions*sA).toFixed(1)};
+  const B={spend:base.spend*sB,clicks:Math.round(base.clicks*sB),impressions:Math.round(base.impressions*sB),conversions:+(base.conversions*sB).toFixed(1)};
   const metrics=[
     {label:'Forbruk',keyA:A.spend,keyB:B.spend,fmt:v=>'kr '+v.toFixed(0)},
     {label:'Klikk',keyA:A.clicks,keyB:B.clicks,fmt:v=>v.toLocaleString('nb-NO')},
@@ -1619,7 +1572,7 @@ async function sendChat(){
   chatHistory.push({role:'user',content:msg});
   const url=getWorker();
   if(!url){
-    addChatMsg('ai','Worker URL er ikke satt. I demo-modus kan jeg svare basert på demo-dataene: '+getDemoAnswer(msg));
+    addChatMsg('ai','Worker URL er ikke satt. Hent live data først og prøv igjen.');
     return;
   }
   const loadEl=addChatMsg('ai','<span class="spinner"></span> Tenker...');
@@ -1637,13 +1590,7 @@ async function sendChat(){
   }
 }
 
-function getDemoAnswer(msg){
-  const m=msg.toLowerCase();
-  if(m.includes('ctr')) return 'Gjennomsnitts CTR er 3,3%. Beste kampanje er "Søk — Sofaer og stolar" med 4,03% — over bransjesnittet på 2,8%.';
-  if(m.includes('kost')||m.includes('forbruk')||m.includes('budsjett')) return 'Totalt forbruk er kr 39 650. PMax bruker mest (56% av budsjettet) og leverer 55% av konverteringene.';
-  if(m.includes('søkeord')) return '"Premium interiør norge" har høyest CTR (5,86%) og QS 9. "Billige sofaer" bør legges til som negativt søkeord — lav QS og feil målgruppe.';
-  return 'Basert på demo-dataene ser kampanjene generelt bra ut. Koble til Worker URL for å analysere ekte data.';
-}
+
 
 function addChatMsg(role,html){
   const msgs=document.getElementById('chat-messages');
@@ -1668,11 +1615,7 @@ async function suggestKeywords(){
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Genererer...';
   const status=document.getElementById('kw-suggest-status');
   const url=getWorker();
-  if(!url){
-    document.getElementById('kw-suggest-result').innerHTML=getDemoKeywords();
-    btn.disabled=false; btn.textContent='Generer søkeordforslag';
-    return;
-  }
+  if(!url){ status.className='status on err'; status.textContent='Worker URL mangler'; btn.disabled=false; btn.textContent='Generer forslag'; return; }
   status.className='status on'; status.textContent='Sender til Claude...';
   try{
     const existing=D.keywords.map(k=>k.keyword).join(', ');
@@ -1690,10 +1633,7 @@ async function suggestKeywords(){
   }
 }
 
-function getDemoKeywords(){
-  const suggestions=['designer sofa norge — kjøperintent, høy relevans','premium skinnsofaer oslo — geografisk + produkt','norsk designsofaer nettbutikk — transaksjonelt','skandinavisk interiør nettbutikk — merkevaresøk','bolia alternativer — konkurrentsøk','ekornes stressless priser — merkevare + pris','norgesdesign møbler — merkevaresøk','luksus soverom interiør — premium segment','norsk håndlaget møbel — differensiator','design spisestue pakke — pakkekjøp intent'];
-  return '<div style="font-size:15px;line-height:2;font-weight:300">'+suggestions.map((s,i)=>`<div><strong>${i+1}.</strong> ${s}</div>`).join('')+'</div>';
-}
+
 
 // ----- AD COPY GENERATOR -----
 async function generateAdCopy(){
@@ -1702,11 +1642,7 @@ async function generateAdCopy(){
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Genererer...';
   const status=document.getElementById('adcopy-status');
   const url=getWorker();
-  if(!url){
-    document.getElementById('adcopy-result').innerHTML=getDemoAdCopy(cat);
-    btn.disabled=false; btn.textContent='Generer annonsekopi';
-    return;
-  }
+  if(!url){ status.className='status on err'; status.textContent='Worker URL mangler'; btn.disabled=false; btn.textContent='Generer'; return; }
   status.className='status on'; status.textContent='Genererer annonsekopi...';
   try{
     const result=await wPost('/ai',{
@@ -1723,16 +1659,7 @@ async function generateAdCopy(){
   }
 }
 
-function getDemoAdCopy(cat){
-  return `<div style="font-size:15px;line-height:2;font-weight:300">
-  <strong>Annonse 1 — ${cat}</strong><br>
-  Overskrifter: "Norsk Design ${cat}" | "Premium Kvalitet | Novooi" | "Gratis Frakt Over kr 3000"<br>
-  Descriptions: "Opplev 100+ norske designere samlet på ett sted. Håndplukkede møbler med livsgaranti." | "Fri retur i 30 dager. Norges største utvalg av premium interiør og møbler."<br><br>
-  <strong>Annonse 2 — ${cat}</strong><br>
-  Overskrifter: "Kjøp ${cat} på Nett" | "Skandinavisk Design" | "Rask Levering Norge"<br>
-  Descriptions: "Fra klassikere til moderne design — finn ditt perfekte møbel blant 1000+ produkter." | "Norske merkevarer og designere. Ekspertservice og personlig veiledning."
-  </div>`;
-}
+
 
 // ----- TAB ANALYSIS -----
 const TAB_PROMPTS = {
@@ -1865,88 +1792,10 @@ function renderAnalysisMarkdown(text){
   }).join('');
 }
 
-function getDemoAnalysis(type){
-  const demo = {
-    campaigns: `<div class="analysis-section">
-      <span class="analysis-label improve">Forbedringer</span>
-      <div class="analysis-item improve"><div class="analysis-item-title">PMax — Møbler generelt</div><div class="analysis-item-body">Del opp i separate asset groups per kategori (sofaer, bord, soverom). PMax-kampanjer med én bred asset group mister relevans — hver gruppe bør ha egne bilder, overskrifter og landingssider som matcher kategorien. CTR vil øke og CPA vil synke.</div></div>
-      <div class="analysis-item improve"><div class="analysis-item-title">Display — Remarketing</div><div class="analysis-item-body">CTR på 0,25% er under bransjenorm. Bytt til <strong>Custom Audience</strong> basert på produktsider besøkt siste 14 dager i stedet for generell remarketing. Segmenter på produktkategori slik at folk som så på sofaer får sofa-annonser.</div></div>
-      <div class="analysis-item improve"><div class="analysis-item-title">Søk — Belysning (pauset)</div><div class="analysis-item-body">Reaktiver med et begrenset testbudsjett (kr 50/dag) i mars–april. Belysning er et sterkt impulskjøp om våren og kan drive mersalg til eksisterende møbelkunder.</div></div>
-    </div>
-    <div class="analysis-section">
-      <span class="analysis-label strategic">Strategiske alternativer</span>
-      <div class="analysis-item strategic"><div class="analysis-item-title">Display — Remarketing → Bytt til YouTube</div><div class="analysis-item-body">Display-kampanjen bruker kr 1 800 og gir kun 1,4 konverteringer (CPA kr 1 286). Vurder å <strong>erstatte den helt med YouTube In-Stream</strong>: En 15-sekunders video av Novoois sortiment mot en Custom Audience av nettstedbesøkere vil bygge merkevare og konvertere bedre i premium-segmentet der visuelle formater har høyere gjennomslag.</div></div>
-      <div class="analysis-item strategic"><div class="analysis-item-title">Søk — Sofaer og Bord → Slå sammen eller splitt hardere</div><div class="analysis-item-body">To alternativer: (A) <strong>Slå alle søkekampanjer til én</strong> med sterke annonsegrupper per kategori — gir mer data til Smart Bidding. Eller (B) <strong>Splitt mye hardere</strong>: separat kampanje per prisnivå (under kr 10k / over kr 10k) slik at budene kan settes etter kjøpsintensjon og margin.</div></div>
-      <div class="analysis-item critical"><div class="analysis-item-title">PMax — Vurder å sette søkeordutslukninger</div><div class="analysis-item-body">PMax kanibalisererer sannsynligvis trafikk fra Søk-kampanjene dine. Legg til <strong>brand-eksklusjoner og kjernesøkeord som negative</strong> på PMax, slik at Søk-kampanjene får ta de høyest-intenderte søkene. Dette er en ofte oversett innstilling som kan redusere samlet CPA med 15–25%.</div></div>
-    </div>`,
-    keywords: `<div class="analysis-section">
-      <span class="analysis-label improve">Forbedringer</span>
-      <div class="analysis-item improve"><div class="analysis-item-title">kjøp sofa nettbutikk (QS 6, BROAD)</div><div class="analysis-item-body">Bytt til <strong>PHRASE match</strong> og legg til søkeordet i annonseoverskriften. "Kjøp" signaliserer kjøpsintensjon — disse klikkene er verdifulle men BROAD sløser budsjett på irrelevante varianter. Forventet QS-økning: 6 → 8.</div></div>
-      <div class="analysis-item improve"><div class="analysis-item-title">premium interiør norge (QS 9, EXACT)</div><div class="analysis-item-body">Dette er ditt beste søkeord med 5,86% CTR. <strong>Øk budet med 40%</strong> og vurder å lage en dedikert landingsside som fremhever de norske designerne spesifikt. Potensialet er ikke fullt utnyttet.</div></div>
-      <div class="analysis-item critical"><div class="analysis-item-title">billige sofaer (QS 3, BROAD)</div><div class="analysis-item-body"><strong>Pause umiddelbart.</strong> QS 3, 0,2 konverteringer på kr 980 forbruk. "Billig" er feil målgruppe for Novooi — dette søkeordet skader QS på annonsegruppen og driver irrelevant trafikk. Legg til "billig", "billige", "rimelig" som negative på tvers av alle kampanjer.</div></div>
-    </div>
-    <div class="analysis-section">
-      <span class="analysis-label strategic">Strategiske alternativer</span>
-      <div class="analysis-item strategic"><div class="analysis-item-title">Norske merkevaresøk mangler helt</div><div class="analysis-item-body">Dataene viser ingen søkeord på spesifikke norske merkevarer (Ekornes, Hov Dokka, Brunstad, Slettvoll). <strong>Opprett en dedikert merkevare-kampanje</strong> med exact match på disse. Folk som søker på merkevarer er langt lenger i kjøpsreisen og konverterer vesentlig bedre enn generiske søk.</div></div>
-      <div class="analysis-item strategic"><div class="analysis-item-title">møbler på nett (QS 5, BROAD) → Del i kjøperintent-grupper</div><div class="analysis-item-body">I stedet for ett bredt søkeord, bygg tre separate grupper: <strong>(1)</strong> "kjøpe møbler på nett" (transaksjonsintensjon), <strong>(2)</strong> "norske møbler nettbutikk" (merkevareutforsking), <strong>(3)</strong> "inspirasjon møbler" (tidlig fase). Hvert segment fortjener ulik annonsekopi og budstrategi.</div></div>
-    </div>
-    <div class="analysis-section">
-      <span class="analysis-label strategic">Søkeord vi mangler</span>
-      <div class="analysis-item strategic"><div class="analysis-item-body"><strong>Norske designer-merker:</strong> Ekornes, Hov Dokka, Brunstad, Slettvoll, Dentti<br><strong>Roms-spesifikke:</strong> "møbler til stue", "soverom innredning", "kontormøbler hjemmekontor"<br><strong>Stil-søk:</strong> "japandi interiør", "wabi-sabi møbler", "minimalistisk stue innredning"<br><strong>Gavekjøp:</strong> "gave til nytt hjem", "bryllupsgave møbler"</div></div>
-    </div>`,
-    ads: `<div class="analysis-section">
-      <span class="analysis-label improve">Forbedringer</span>
-      <div class="analysis-item improve"><div class="analysis-item-title">Norsk Design Sofa | Novooi (CTR 4,24%)</div><div class="analysis-item-body">Dette er din beste annonse — <strong>legg til prisankring</strong> for å øke CTR ytterligere: Test "Norsk Design Sofa | Fra kr 4 990" og "Håndlaget i Norge | Se 200+ Modeller". Høy CTR betyr at meldingen resonerer — optimaliser videre fremfor å endre grunnleggende.</div></div>
-      <div class="analysis-item improve"><div class="analysis-item-title">Designmøbler fra 100+ Merkevarer (CTR 2,21%)</div><div class="analysis-item-body">Under bransjenorm. Problemet er at "100+ merkevarer" er abstrakt. <strong>Gjør det konkret:</strong> "Ekornes, Brunstad, Slettvoll — Alt på Novooi" eller "Norges Største Utvalg av Premium Møbler". Navngi faktiske merkevarer kunden kjenner igjen.</div></div>
-      <div class="analysis-item improve"><div class="analysis-item-title">Norske Møbler | Gratis Frakt Over 3000 (CTR 2,33%)</div><div class="analysis-item-body">"Gratis frakt over 3000" er et svakt insentiv for en premium nettbutikk der kunden typisk bruker kr 15 000+. <strong>Bytt til:</strong> "Gratis montering i Oslo og Viken" eller "30 dagers bytterett — Ingen risiko".</div></div>
-    </div>
-    <div class="analysis-section">
-      <span class="analysis-label strategic">Strategiske alternativer</span>
-      <div class="analysis-item strategic"><div class="analysis-item-title">Alle annonser → Emosjonell vs. rasjonell split-test</div><div class="analysis-item-body">Alle nåværende annonser er <strong>rasjonelle</strong> (pris, utvalg, frakt). Test en <strong>emosjonell variant</strong> som appellerer til identitet og livsstil: "Hjemmet ditt forteller hvem du er", "Norsk håndverk — varer i generasjoner", "Design som stopper deg i døren". Premium-kunder kjøper ofte på følelse, ikke logikk.</div></div>
-      <div class="analysis-item strategic"><div class="analysis-item-title">Generelle annonser → Kategori-spesifikke annonser</div><div class="analysis-item-body">I stedet for generiske annonser for hele Novooi, <strong>bytt til strikt kategoribasert</strong> annonsering: Sofaannonser vises kun til sofa-søk, med sofa-spesifikke USP-er og direkte lenke til sofakategorien. Dette øker relevans, QS og conv rate betydelig. Krever mer oppsett men er standarden for vinnende e-commerce-struktur.</div></div>
-      <div class="analysis-item strategic"><div class="analysis-item-title">Norsk Interiør på Nett (CTR 3,04%) → Test konkurrentposisjonering</div><div class="analysis-item-body">En uutprøvd strategi: <strong>Direkte sammenligningsannonser</strong> mot IKEA. "Alt IKEA ikke har — Norsk Design på Novooi" eller "Hev standarden fra IKEA til norsk håndverk". Høy risiko men høy belønning — fanger folk midt i beslutningsprosessen.</div></div>
-    </div>
-    <div class="analysis-section">
-      <span class="analysis-label strategic">Generelle observasjoner</span>
-      <div class="analysis-item"><div class="analysis-item-body"><strong>Mangel på sosiale bevis:</strong> Ingen av annonsene nevner kundevurderinger, antall kunder eller tillitssignaler. Test "Over 10 000 fornøyde kunder" eller "4,8/5 stjerner".<br><br><strong>Ingen urgency:</strong> Premium-kunder er ikke prisfokusert, men de reagerer på eksklusivitet: "Begrenset opplag", "Siste exemplar", "Forhåndsbestill til vår 2025".<br><br><strong>Landingssider er trolig flaskehalsen:</strong> Med CTR på 2-4% men conv rate på kun 1,5-2,4% er det mer å hente på landingssidene enn i annonsekopien.</div></div>
-    </div>`
-  };
-  return demo[type] || '<p>Ingen demo-analyse tilgjengelig.</p>';
-}
+
 
 // ----- DAILY ALERT TEST -----
-async function testDemoAlert(){
-  const url = getWorker();
-  const btn = document.getElementById('demo-alert-btn');
-  const statusEl = document.getElementById('daily-test-status');
-  if(!url){
-    statusEl.className='status on err';
-    statusEl.textContent='Lim inn Worker URL i feltet øverst først';
-    return;
-  }
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Sender test-varsling...';
-  statusEl.className = 'status on';
-  statusEl.textContent = 'Genererer demo-varsling og sender e-post...';
-  try {
-    const r = await fetch(url+'/send-demo-alert', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-App-Password': sessionPW },
-      body: JSON.stringify({ data: getDataSummary() })
-    });
-    const d = await r.json();
-    if(d.error) throw new Error(d.error);
-    statusEl.className = 'status on ok';
-    statusEl.textContent = 'Test-varsling sendt — sjekk innboksen';
-    logAction('Demo-varsling sendt via e-post');
-  } catch(e) {
-    statusEl.className = 'status on err';
-    statusEl.textContent = 'Feil: ' + e.message;
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Send test-varsling (demo-data)';
-  }
-}
+
 
 
 async function testMonthlyReport(){
@@ -2025,7 +1874,7 @@ function showMain(type,msg){
 }
 
 // ----- PDF REPORT -----
-async function generateReport(useDemo){
+async function generateReport(){
   const btn = useDemo ? document.getElementById('rpt-demo-btn') : document.getElementById('rpt-live-btn');
   const statusEl = document.getElementById('rpt-status');
   btn.disabled = true;
@@ -2042,7 +1891,7 @@ async function generateReport(useDemo){
   const incBench = document.getElementById('rpt-bench').checked;
   const incDate = document.getElementById('rpt-date').checked;
 
-  const data = useDemo ? {campaigns:DEMO_CAMPAIGNS,adGroups:DEMO_ADGROUPS,ads:DEMO_ADS,keywords:DEMO_KEYWORDS} : D;
+  const data = D;
 
   let aiAnalysis = '';
   if(incAnalysis){
@@ -2076,11 +1925,9 @@ async function generateReport(useDemo){
   btn.textContent = useDemo ? 'Last ned testrapport (demo-data)' : 'Generer rapport (live data)';
 }
 
-function getDemoAiSummary(period){
-  return `Novoois Google Ads-konto leverer solid ytelse med totalt forbruk på kr 39 650 og 52 konverteringer de siste ${period} dagene. CTR på 3,3% overstiger bransjenormen på 2,8%, som indikerer sterk annonserelevans.\n\nAnbefalinger:\n1. Pause "billige sofaer" umiddelbart — QS 3 og feil målgruppe\n2. Øk bud på "premium interiør norge" med 40% (QS 9, CTR 5,86%)\n3. Del PMax-kampanjen i separate asset groups per kategori\n4. Erstatt Display-remarketing med YouTube In-Stream\n5. Legg til norske merkevaresøk (Ekornes, Brunstad) i ny kampanje`;
-}
 
-async function buildPDF(data, period, opts, aiText, isDemo){
+
+async function buildPDF(data, period, opts, aiText){
   if(typeof window.jspdf === 'undefined'){
     await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
   }
@@ -2219,7 +2066,7 @@ async function buildPDF(data, period, opts, aiText, isDemo){
   doc.text('Google Ads Performance Report', W/2, 122, {align:'center'});
   setFont(10,'normal'); setColor([160,140,100]);
   doc.text('Siste '+period+' dager', W/2, 133, {align:'center'});
-  if(isDemo){
+  if(false){
     setFont(8,'normal'); setColor(ORANGE_C);
     doc.text('— DEMO DATA —', W/2, 143, {align:'center'});
   }
