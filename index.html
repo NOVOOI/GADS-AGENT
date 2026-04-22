@@ -184,6 +184,44 @@ td{padding:9px 14px;color:var(--ink)}
 /* ═══ SPARKLINE ══════════════════════════════════════════════════ */
 .sparkline{display:inline-block;vertical-align:middle}
 
+/* ═══ TONE SELECTOR ══════════════════════════════════════════════ */
+.tone-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+.tone-card{border:1px solid var(--border);padding:14px;cursor:pointer;text-align:center;transition:all .15s;background:var(--bg2)}
+.tone-card:hover{border-color:var(--accent)}
+.tone-card.selected{border-color:var(--accent);background:var(--accent);color:#fff}
+.tone-card.selected .tone-label,.tone-card.selected .tone-desc{color:#fff}
+.tone-icon{font-size:20px;margin-bottom:6px}
+.tone-label{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);margin-bottom:4px}
+.tone-desc{font-size:11px;color:var(--ink3);line-height:1.4}
+
+/* ═══ ANALYSIS ACCORDION ════════════════════════════════════════ */
+.ai-accordion{border:1px solid var(--border);margin-bottom:10px;overflow:hidden}
+.ai-acc-header{padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--bg2);user-select:none;transition:background .15s}
+.ai-acc-header:hover{background:var(--bg3)}
+.ai-acc-type{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ai-acc-title{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink);flex:1;letter-spacing:.03em}
+.ai-acc-badge{font-family:var(--mono);font-size:8px;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border:1px solid}
+.ai-acc-arrow{font-family:var(--mono);font-size:10px;color:var(--ink3);transition:transform .2s}
+.ai-acc-body{display:none;padding:16px;border-top:1px solid var(--border);background:var(--surface)}
+.ai-acc-body.open{display:block}
+.ai-acc-arrow.open{transform:rotate(180deg)}
+.ai-acc-desc{font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:14px}
+.ai-acc-action{background:var(--bg2);border:1px solid var(--border);padding:12px 14px;margin-bottom:8px}
+.ai-acc-action-label{font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.ai-acc-action-text{font-size:12px;color:var(--ink);font-family:var(--mono);line-height:1.6}
+.ai-acc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.ai-acc-tag{font-family:var(--mono);font-size:9px;padding:3px 8px;background:var(--bg3);border:1px solid var(--border2);color:var(--ink2);cursor:pointer}
+.ai-acc-tag:hover{border-color:var(--good);color:var(--good)}
+
+/* ═══ KW GROUPED ══════════════════════════════════════════════════ */
+.kw-group{border:1px solid var(--border);margin-bottom:10px;overflow:hidden}
+.kw-group-header{padding:10px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:var(--ink);color:var(--bg);user-select:none}
+.kw-group-name{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.kw-group-meta{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.4)}
+.kw-group-table{display:none}
+.kw-group-table.open{display:block}
+
+
 /* ═══ BUDGET ═════════════════════════════════════════════════════ */
 .budget-track{width:100%;height:6px;background:var(--border);margin:8px 0 4px}
 .budget-fill{height:100%;transition:width .5s}
@@ -462,18 +500,35 @@ td{padding:9px 14px;color:var(--ink)}
       <div class="block">
         <div class="block-head">
           <div class="block-title">Søkeord</div>
-          <button class="btn btn-ghost btn-sm" onclick="exportCSV('keywords')">Eksporter CSV</button>
+          <div class="btn-row">
+            <button class="btn btn-ghost btn-sm" onclick="toggleKwView()">Bytt visning</button>
+            <button class="btn btn-ghost btn-sm" onclick="exportCSV('keywords')">Eksporter CSV</button>
+          </div>
         </div>
         <div class="table-controls">
-          <input type="text" class="table-search" placeholder="Søk..." oninput="filterTable('keywords-tbl',this.value)">
-          <select style="padding:6px 8px;font-family:var(--mono);font-size:10px;border:1px solid var(--border);background:var(--bg2);color:var(--ink);outline:none" onchange="filterTable('keywords-tbl','',this.value,'matchType')">
-            <option value="">Alle match</option>
+          <input type="text" class="table-search" id="kw-search" placeholder="Søk i søkeord..." oninput="renderKeywordsView()">
+          <select id="kw-match-filter" style="padding:6px 8px;font-family:var(--mono);font-size:10px;border:1px solid var(--border);background:var(--bg2);color:var(--ink);outline:none" onchange="renderKeywordsView()">
+            <option value="">Alle match-typer</option>
             <option value="EXACT">Eksakt</option>
             <option value="PHRASE">Frase</option>
             <option value="BROAD">Bred</option>
           </select>
+          <select id="kw-sort-field" style="padding:6px 8px;font-family:var(--mono);font-size:10px;border:1px solid var(--border);background:var(--bg2);color:var(--ink);outline:none" onchange="renderKeywordsView()">
+            <option value="costMicros">Sorter: Forbruk</option>
+            <option value="clicks">Sorter: Klikk</option>
+            <option value="ctr">Sorter: CTR</option>
+            <option value="conversions">Sorter: Konv.</option>
+            <option value="qs">Sorter: QS</option>
+          </select>
+          <select id="kw-qs-filter" style="padding:6px 8px;font-family:var(--mono);font-size:10px;border:1px solid var(--border);background:var(--bg2);color:var(--ink);outline:none" onchange="renderKeywordsView()">
+            <option value="">Alle QS</option>
+            <option value="low">QS lav (1-4)</option>
+            <option value="mid">QS middels (5-7)</option>
+            <option value="high">QS høy (8-10)</option>
+          </select>
+          <span id="kw-count" style="font-family:var(--mono);font-size:10px;color:var(--ink3);margin-left:8px"></span>
         </div>
-        <div class="table-wrap"><table id="keywords-tbl"></table></div>
+        <div id="keywords-view"></div>
       </div>
       <div class="block" id="qs-guide-block">
         <div class="block-head"><div class="block-title">QS-forbedringsguide</div></div>
@@ -501,9 +556,25 @@ td{padding:9px 14px;color:var(--ink)}
         <div class="block-body"><p style="font-size:13px;color:var(--ink2);margin-bottom:12px">Faktiske søk brukere brukte som trigget annonsene — ikke søkeordene du byder på. Gull for å finne negative søkeord.</p>
         <div id="st-status" class="status"></div></div>
         <div id="st-controls" style="display:none" class="table-controls">
-          <input type="text" class="table-search" placeholder="Søk i termer..." oninput="filterTable('st-tbl',this.value)">
+          <input type="text" class="table-search" id="st-search" placeholder="Søk i søketermer..." oninput="renderSearchTermsView()">
+          <select id="st-status-filter" style="padding:6px 8px;font-family:var(--mono);font-size:10px;border:1px solid var(--border);background:var(--bg2);color:var(--ink);outline:none" onchange="renderSearchTermsView()">
+            <option value="">Alle statuser</option>
+            <option value="NONE">Ikke lagt til</option>
+            <option value="ADDED">Lagt til som søkeord</option>
+            <option value="EXCLUDED">Ekskludert</option>
+          </select>
+          <select id="st-sort-field" style="padding:6px 8px;font-family:var(--mono);font-size:10px;border:1px solid var(--border);background:var(--bg2);color:var(--ink);outline:none" onchange="renderSearchTermsView()">
+            <option value="costMicros">Sorter: Forbruk</option>
+            <option value="clicks">Sorter: Klikk</option>
+            <option value="ctr">Sorter: CTR</option>
+            <option value="conversions">Sorter: Konv.</option>
+          </select>
+          <select id="st-campaign-filter" style="padding:6px 8px;font-family:var(--mono);font-size:10px;border:1px solid var(--border);background:var(--bg2);color:var(--ink);outline:none" onchange="renderSearchTermsView()">
+            <option value="">Alle kampanjer</option>
+          </select>
+          <span id="st-count" style="font-family:var(--mono);font-size:10px;color:var(--ink3);margin-left:8px"></span>
         </div>
-        <div class="table-wrap"><table id="st-tbl"></table></div>
+        <div id="st-view"></div>
       </div>
     </div>
 
@@ -690,7 +761,14 @@ td{padding:9px 14px;color:var(--ink)}
       <div class="block">
         <div class="block-head"><div class="block-title">Generer PDF-rapport</div></div>
         <div class="block-body">
-          <p style="font-size:13px;color:var(--ink2);margin-bottom:24px">Eksporter fullstendig Google Ads-rapport som PDF — klar til å dele med ledelse.</p>
+          <p style="font-size:13px;color:var(--ink2);margin-bottom:24px">Eksporter en analyse-rapport med kun de viktigste funnene — klar til å dele med ledelse.</p>
+          <div style="font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Tone og vinkling</div>
+          <div class="tone-grid">
+            <div class="tone-card" onclick="selectTone('negative',this)"><div class="tone-icon">📉</div><div class="tone-label">Negativt</div><div class="tone-desc">Kun problemer og kritiske funn</div></div>
+            <div class="tone-card selected" id="tone-brutal" onclick="selectTone('brutal',this)"><div class="tone-icon">⚖️</div><div class="tone-label">Brutalt ærlig</div><div class="tone-desc">Alt som fungerer og ikke fungerer</div></div>
+            <div class="tone-card" onclick="selectTone('positive',this)"><div class="tone-icon">📈</div><div class="tone-label">Positiv vinkling</div><div class="tone-desc">Fokus på muligheter og fremgang</div></div>
+            <div class="tone-card" onclick="selectTone('wins',this)"><div class="tone-icon">🏆</div><div class="tone-label">Kun wins</div><div class="tone-desc">Bare det som går bra</div></div>
+          </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px">
             <div>
               <div style="font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px">Tidsperiode</div>
@@ -728,6 +806,148 @@ td{padding:9px 14px;color:var(--ink)}
 <div id="main-status" class="status" style="position:fixed;bottom:20px;right:20px;max-width:360px;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.12)"></div>
 
 <script>
+// ===== TONE SELECTOR =====
+let selectedTone = 'brutal';
+function selectTone(tone, el){
+  selectedTone = tone;
+  document.querySelectorAll('.tone-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ===== KEYWORD VIEW =====
+let kwViewMode = 'grouped'; // 'grouped' or 'flat'
+function toggleKwView(){
+  kwViewMode = kwViewMode === 'grouped' ? 'flat' : 'grouped';
+  renderKeywordsView();
+}
+
+function renderKeywordsView(){
+  const search = (document.getElementById('kw-search')?.value || '').toLowerCase();
+  const matchF = document.getElementById('kw-match-filter')?.value || '';
+  const sortF  = document.getElementById('kw-sort-field')?.value || 'costMicros';
+  const qsF    = document.getElementById('kw-qs-filter')?.value || '';
+  const el     = document.getElementById('keywords-view');
+  if(!el || !D.keywords.length){ return; }
+
+  let kws = D.keywords.filter(k => {
+    if(search && !k.keyword?.toLowerCase().includes(search) && !k.campaign?.toLowerCase().includes(search)) return false;
+    if(matchF && k.matchType !== matchF) return false;
+    if(qsF === 'low'  && (k.qs < 1 || k.qs > 4)) return false;
+    if(qsF === 'mid'  && (k.qs < 5 || k.qs > 7)) return false;
+    if(qsF === 'high' && k.qs < 8) return false;
+    return true;
+  }).sort((a,b) => b[sortF] - a[sortF]);
+
+  const countEl = document.getElementById('kw-count');
+  if(countEl) countEl.textContent = kws.length + ' søkeord';
+
+  if(kwViewMode === 'flat'){
+    // Flat table
+    const tbl = document.createElement('div');
+    tbl.className = 'table-wrap';
+    tbl.innerHTML = buildKwTable(kws);
+    el.innerHTML = '';
+    el.appendChild(tbl);
+    return;
+  }
+
+  // Grouped by campaign
+  const groups = {};
+  kws.forEach(k => {
+    const camp = k.campaign || 'Ukjent';
+    if(!groups[camp]) groups[camp] = [];
+    groups[camp].push(k);
+  });
+
+  el.innerHTML = Object.entries(groups).map(([camp, ks]) => {
+    const totalClicks = ks.reduce((s,k)=>s+k.clicks,0);
+    const totalSpend  = ks.reduce((s,k)=>s+k.costMicros,0)/1e6;
+    const avgQs       = ks.filter(k=>k.qs>0).reduce((s,k)=>s+k.qs,0) / (ks.filter(k=>k.qs>0).length||1);
+    return `<div class="kw-group">
+      <div class="kw-group-header" onclick="toggleKwGroup(this)">
+        <span class="kw-group-name">${camp}</span>
+        <span class="kw-group-meta">${ks.length} søkeord · ${fmt(totalClicks)} klikk · ${kr(totalSpend*1e6)} · Snitt QS ${avgQs.toFixed(1)}</span>
+      </div>
+      <div class="kw-group-table open">${buildKwTable(ks)}</div>
+    </div>`;
+  }).join('');
+}
+
+function buildKwTable(kws){
+  const matchLabels={EXACT:'Eksakt',PHRASE:'Frase',BROAD:'Bred'};
+  const rows = kws.map(k => {
+    const qsColor = k.qs>=8?'var(--good)':k.qs>=5?'var(--warn)':k.qs>0?'var(--bad)':'var(--ink3)';
+    return `<tr>
+      <td><span style="font-weight:500">${k.keyword||'—'}</span></td>
+      <td><span class="badge b-gray">${matchLabels[k.matchType]||k.matchType||'—'}</span></td>
+      <td class="mono" style="font-size:11px;color:var(--ink3)">${k.campaign||'—'}</td>
+      <td class="mono">${fmt(k.impressions)}</td>
+      <td class="mono">${fmt(k.clicks)}</td>
+      <td class="mono ${ctrClass(k.ctr,'SEARCH')}">${pct(k.ctr)}</td>
+      <td class="mono">${kr(k.costMicros)}</td>
+      <td class="mono">${k.conversions.toFixed(1)}</td>
+      <td><span style="font-family:var(--mono);font-size:11px;color:${qsColor};font-weight:700">${k.qs||'—'}</span></td>
+    </tr>`;
+  }).join('');
+  return `<table style="min-width:700px;width:100%;border-collapse:collapse;font-size:13px">
+    <thead><tr style="background:var(--ink);color:var(--bg)"><th style="padding:8px 12px;text-align:left;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400">Søkeord</th><th style="padding:8px 12px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;text-align:left">Match</th><th style="padding:8px 12px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;text-align:left">Kampanje</th><th style="padding:8px 12px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;text-align:left">Visn.</th><th style="padding:8px 12px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;text-align:left">Klikk</th><th style="padding:8px 12px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;text-align:left">CTR</th><th style="padding:8px 12px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;text-align:left">Forbruk</th><th style="padding:8px 12px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;text-align:left">Konv.</th><th style="padding:8px 12px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;text-align:left">QS</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function toggleKwGroup(header){
+  const tbl = header.nextElementSibling;
+  tbl.classList.toggle('open');
+}
+
+// ===== SEARCH TERMS VIEW =====
+function renderSearchTermsView(){
+  const search = (document.getElementById('st-search')?.value||'').toLowerCase();
+  const statusF = document.getElementById('st-status-filter')?.value||'';
+  const sortF   = document.getElementById('st-sort-field')?.value||'costMicros';
+  const campF   = document.getElementById('st-campaign-filter')?.value||'';
+  const el      = document.getElementById('st-view');
+  if(!el || !D.searchterms?.length) return;
+
+  let terms = (D.searchterms||[]).filter(t => {
+    if(search && !t.term?.toLowerCase().includes(search) && !t.campaign?.toLowerCase().includes(search)) return false;
+    if(statusF && t.status !== statusF) return false;
+    if(campF && t.campaign !== campF) return false;
+    return true;
+  }).sort((a,b) => b[sortF] - a[sortF]);
+
+  const countEl = document.getElementById('st-count');
+  if(countEl) countEl.textContent = terms.length + ' søketermer';
+
+  const statusLabels = {ADDED:'Lagt til',EXCLUDED:'Ekskludert',NONE:'Ingen'};
+  const statusBadge  = {ADDED:'b-green',EXCLUDED:'b-red',NONE:'b-gray'};
+
+  const rows = terms.map(t => `<tr>
+    <td><span style="font-weight:500;max-width:280px;display:inline-block">${t.term}</span></td>
+    <td><span class="badge ${statusBadge[t.status]||'b-gray'}">${statusLabels[t.status]||t.status}</span></td>
+    <td class="mono" style="font-size:10px;color:var(--ink3)">${t.campaign}</td>
+    <td class="mono">${fmt(t.impressions)}</td>
+    <td class="mono">${fmt(t.clicks)}</td>
+    <td class="mono ${ctrClass(t.ctr,'SEARCH')}">${pct(t.ctr)}</td>
+    <td class="mono">${kr(t.costMicros)}</td>
+    <td class="mono">${t.conversions.toFixed(1)}</td>
+  </tr>`).join('');
+
+  el.innerHTML = `<div class="table-wrap"><table style="min-width:700px;width:100%;border-collapse:collapse;font-size:13px">
+    <thead><tr style="background:var(--ink);color:var(--bg)">
+      <th style="padding:8px 12px;text-align:left;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400">Søketerm</th>
+      <th style="padding:8px 12px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;text-align:left">Status</th>
+      <th style="padding:8px 12px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;text-align:left">Kampanje</th>
+      <th style="padding:8px 12px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;text-align:left">Visn.</th>
+      <th style="padding:8px 12px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;text-align:left">Klikk</th>
+      <th style="padding:8px 12px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;text-align:left">CTR</th>
+      <th style="padding:8px 12px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;text-align:left">Forbruk</th>
+      <th style="padding:8px 12px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;text-align:left">Konv.</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
 // ===== DARK MODE =====
 function toggleDark(){
   const html=document.documentElement;
@@ -835,7 +1055,12 @@ async function wPost(path,body){
 
 // ----- DEMO DATA -----
 const SPARK={};
-function genSpark(){ return Array.from({length:14},(_,i)=>Math.round(20+Math.random()*40+Math.sin(i/2)*10)); }
+function genSpark(camp){
+  // Generate plausible trend based on campaign CTR with slight variation
+  const base = (camp?.ctr||0.02)*100;
+  const vol = Math.max(base*0.3, 0.2);
+  return Array.from({length:14},(_,i)=>Math.max(0, base + (Math.random()-0.5)*vol*2 + Math.sin(i/3)*vol*0.5));
+}
 
 
 
@@ -861,12 +1086,12 @@ async function fetchAll(){
       wPost('/ads/query',{query:`SELECT ad_group_criterion.keyword.text,ad_group_criterion.keyword.match_type,campaign.name,metrics.impressions,metrics.clicks,metrics.cost_micros,metrics.conversions,metrics.ctr,metrics.average_cpc,ad_group_criterion.quality_info.quality_score FROM keyword_view WHERE segments.date DURING ${period} ORDER BY metrics.cost_micros DESC LIMIT 100`})
     ]);
     D={
-      campaigns:c.results.map(r=>({name:r.campaign?.name,status:r.campaign?.status,type:r.campaign?.advertisingChannelType,impressions:Number(r.metrics?.impressions||0),clicks:Number(r.metrics?.clicks||0),ctr:Number(r.metrics?.ctr||0),costMicros:Number(r.metrics?.costMicros||0),conversions:r.metrics?.conversions||0,conversionRate:r.metrics?.conversionRate||0,avgCpc:r.metrics?.averageCpc||0})),
+      campaigns:c.results.filter(r=>r.campaign?.status==='ENABLED').map(r=>({name:r.campaign?.name,status:r.campaign?.status,type:r.campaign?.advertisingChannelType,impressions:Number(r.metrics?.impressions||0),clicks:Number(r.metrics?.clicks||0),ctr:Number(r.metrics?.ctr||0),costMicros:Number(r.metrics?.costMicros||0),conversions:Number(r.metrics?.conversions||0),conversionRate:Number(r.metrics?.conversionRate||0),avgCpc:Number(r.metrics?.averageCpc||0)})),
       adGroups:ag.results.map(r=>({name:r.adGroup?.name,campaign:r.campaign?.name,status:r.adGroup?.status,impressions:Number(r.metrics?.impressions||0),clicks:Number(r.metrics?.clicks||0),ctr:Number(r.metrics?.ctr||0),costMicros:Number(r.metrics?.costMicros||0),conversions:r.metrics?.conversions||0})),
       ads:a.results.map(r=>({headline:r.adGroupAd?.ad?.responsiveSearchAd?.headlines?.slice(0,2).map(h=>h.text).join(' | ')||r.adGroupAd?.ad?.type||'—',campaign:r.campaign?.name,status:r.adGroupAd?.status,impressions:r.metrics?.impressions||0,clicks:r.metrics?.clicks||0,ctr:r.metrics?.ctr||0,conversions:r.metrics?.conversions||0})),
       keywords:k.results.map(r=>({keyword:r.adGroupCriterion?.keyword?.text,matchType:r.adGroupCriterion?.keyword?.matchType,campaign:r.campaign?.name,impressions:Number(r.metrics?.impressions||0),clicks:Number(r.metrics?.clicks||0),ctr:Number(r.metrics?.ctr||0),costMicros:Number(r.metrics?.costMicros||0),conversions:r.metrics?.conversions||0,qs:r.adGroupCriterion?.qualityInfo?.qualityScore||0}))
     };
-    D.campaigns.forEach(c=>{SPARK[c.name]=genSpark();});
+    D.campaigns.forEach(c=>{SPARK[c.name]=genSpark(c);});
     renderAll();
     setTopStatus('live data','green');
     logAction('Live data hentet ('+period+')');
@@ -1064,18 +1289,14 @@ async function fetchSearchTerms(){
       conversions:Number(row.metrics?.conversions||0)
     }));
     D.searchterms=terms;
-    const cols=[
-      {key:'term',label:'Søketerm',render:r=>`<span style="font-weight:500">${r.term}</span>`},
-      {key:'status',label:'Status',render:r=>`<span class="badge ${r.status==='ADDED'?'b-green':r.status==='EXCLUDED'?'b-red':'b-gray'}">${r.status==='ADDED'?'Lagt til':r.status==='EXCLUDED'?'Ekskludert':'Ingen'}</span>`},
-      {key:'campaign',label:'Kampanje',render:r=>`<span class="mono" style="font-size:11px;color:var(--brown)">${r.campaign}</span>`},
-      {key:'impressions',label:'Visninger',render:r=>`<span class="mono">${fmt(r.impressions)}</span>`},
-      {key:'clicks',label:'Klikk',render:r=>`<span class="mono">${fmt(r.clicks)}</span>`},
-      {key:'ctr',label:'CTR',render:r=>`<span class="mono ${ctrClass(r.ctr,'SEARCH')}">${pct(r.ctr)}</span>`},
-      {key:'costMicros',label:'Forbruk',render:r=>`<span class="mono">${kr(r.costMicros)}</span>`},
-      {key:'conversions',label:'Konv.',render:r=>`<span class="mono">${r.conversions.toFixed(1)}</span>`},
-    ];
-    buildSortableTable('st-tbl','searchterms',terms,cols);
+    // Populate campaign filter
+    const campSel = document.getElementById('st-campaign-filter');
+    if(campSel){
+      const camps = [...new Set(terms.map(t=>t.campaign).filter(Boolean))].sort();
+      campSel.innerHTML = '<option value="">Alle kampanjer</option>' + camps.map(c=>`<option value="${c}">${c}</option>`).join('');
+    }
     document.getElementById('st-controls').style.display='flex';
+    renderSearchTermsView();
     statusEl.className='status on ok';statusEl.textContent=terms.length+' søketermer hentet';
     logAction('Søketermer hentet: '+terms.length);
   }catch(e){
@@ -1336,21 +1557,7 @@ function renderCampaignsTable(){
 
 // ----- KEYWORDS TABLE -----
 function renderKeywordsTable(){
-  const cols=[
-    {key:'keyword',label:'Søkeord',render:r=>'<span style="font-weight:500">'+r.keyword+'</span>'},
-    {key:'matchType',label:'Match',render:r=>matchBadge(r.matchType)},
-    {key:'campaign',label:'Kampanje',render:r=>'<span class="mono" style="font-size:11px;color:var(--brown)">'+r.campaign+'</span>'},
-    {key:'impressions',label:'Visninger',render:r=>'<span class="mono">'+fmt(r.impressions)+'</span>'},
-    {key:'clicks',label:'Klikk',render:r=>'<span class="mono">'+fmt(r.clicks)+'</span>'},
-    {key:'ctr',label:'CTR',render:r=>`<span class="mono ${ctrClass(r.ctr,'SEARCH')}">${pct(r.ctr)}</span>`},
-    {key:'costMicros',label:'Forbruk',render:r=>'<span class="mono">'+kr(r.costMicros)+'</span>'},
-    {key:'conversions',label:'Konv.',render:r=>'<span class="mono">'+r.conversions.toFixed(1)+'</span>'},
-    {key:'qs',label:'QS',render:r=>{
-      if(!r.qs) return '<span class="mono">—</span>';
-      return `<div class="qs-wrap"><div class="qs-track"><div class="qs-fill" style="width:${r.qs*10}%;background:${qsColor(r.qs)}"></div></div><span class="mono" style="color:${qsColor(r.qs)}">${r.qs}</span></div>`;
-    }},
-  ];
-  buildSortableTable('keywords-tbl','keywords',D.keywords,cols);
+  renderKeywordsView();
 }
 
 // ----- ADGROUPS TABLE -----
@@ -1729,7 +1936,11 @@ Vær direkte og gi faktiske eksempler på tekst, ikke bare generiske råd. Skriv
 };
 
 async function runTabAnalysis(type){
-  const ids = {campaigns:{btn:'camp-analyse-btn',status:'camp-analysis-status',result:'camp-analysis-result'},keywords:{btn:'kw-analyse-btn',status:'kw-analysis-status',result:'kw-analysis-result'},ads:{btn:'ads-analyse-btn',status:'ads-analysis-status',result:'ads-analysis-result'}};
+  const ids = {
+    campaigns:{btn:'camp-analyse-btn',status:'camp-analysis-status',result:'camp-analysis-result'},
+    keywords:{btn:'kw-analyse-btn',status:'kw-analysis-status',result:'kw-analysis-result'},
+    ads:{btn:'ads-analyse-btn',status:'ads-analysis-status',result:'ads-analysis-result'}
+  };
   const id = ids[type];
   const btn = document.getElementById(id.btn);
   const statusEl = document.getElementById(id.status);
@@ -1737,34 +1948,99 @@ async function runTabAnalysis(type){
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Analyserer...';
   statusEl.className = 'status on';
-  statusEl.textContent = 'Claude leser gjennom dataene...';
+  statusEl.textContent = 'Claude analyserer data og lager konkrete forslag...';
   resultEl.innerHTML = '';
   const url = getWorker();
   if(!url){
-    await new Promise(r=>setTimeout(r,900));
-    resultEl.innerHTML = getDemoAnalysis(type);
-    statusEl.className = 'status on ok';
-    statusEl.textContent = 'Demo-analyse fullført';
+    statusEl.className = 'status on err';
+    statusEl.textContent = 'Worker URL mangler — hent live data først';
     btn.disabled = false; btn.textContent = 'Analyser på nytt';
-    logAction('Demo-analyse kjørt: '+type);
     return;
   }
   try {
-    const prompt = TAB_PROMPTS[type];
+    const systemPrompt = `Du er Google Ads-strateg for Novooi, en norsk premium nettbutikk for møbler og interiør.
+Analyser dataene og svar KUN med dette JSON-formatet — ingen annen tekst:
+{
+  "suggestions": [
+    {
+      "type": "critical|improve|strategic|positive",
+      "title": "Kort tittel (maks 8 ord)",
+      "description": "2-3 setninger om hva og hvorfor",
+      "action": "Konkret handling som kan gjøres akkurat nå",
+      "example": "Spesifikt eksempel — f.eks. nøyaktige søkeord, produktnavn fra Novooi-sortimentet, annonsekopi",
+      "tags": ["Søkeord-forslag 1", "Søkeord-forslag 2"]
+    }
+  ]
+}
+Gi 4-7 forslag. type='critical' for alvorlige problemer, 'improve' for forbedringer, 'strategic' for muligheter, 'positive' for det som går bra.
+'tags' brukes til konkrete søkeord, produktnavn, eller kopielementer man kan legge direkte inn.
+Inkluder ALLTID minst ett 'positive'-forslag. Skriv på norsk.`;
+
     const result = await wPost('/ai', {
-      system: prompt.system,
-      messages: [{ role: 'user', content: prompt.userMsg(D) }]
+      system: systemPrompt,
+      messages: [{ role: 'user', content: TAB_PROMPTS[type].userMsg(D) }]
     });
-    resultEl.innerHTML = renderAnalysisMarkdown(result.text);
+
+    let parsed;
+    try {
+      const clean = result.text.replace(/```json|```/g,'').trim();
+      parsed = JSON.parse(clean);
+    } catch(e) {
+      resultEl.innerHTML = renderAnalysisMarkdown(result.text);
+      statusEl.className = 'status on ok';
+      statusEl.textContent = 'Analyse fullført';
+      btn.disabled = false; btn.textContent = 'Analyser på nytt';
+      return;
+    }
+
+    resultEl.innerHTML = renderAnalysisAccordion(parsed.suggestions || []);
     statusEl.className = 'status on ok';
-    statusEl.textContent = 'Analyse fullført';
-    logAction('AI-analyse kjørt: '+type);
+    statusEl.textContent = (parsed.suggestions||[]).length + ' forslag fra Claude';
+    logAction('AI-analyse kjørt: '+type+' — '+(parsed.suggestions||[]).length+' forslag');
   } catch(e) {
     statusEl.className = 'status on err';
     statusEl.textContent = 'Feil: ' + e.message;
   } finally {
     btn.disabled = false; btn.textContent = 'Analyser på nytt';
   }
+}
+
+function renderAnalysisAccordion(suggestions){
+  if(!suggestions || !suggestions.length) return '<div style="color:var(--ink3);font-family:var(--mono);font-size:12px;padding:16px">Ingen forslag generert.</div>';
+  const typeConfig = {
+    critical: {color:'var(--bad)',label:'Kritisk',badgeClass:'b-red'},
+    improve:  {color:'var(--warn)',label:'Forbedring',badgeClass:'b-orange'},
+    strategic:{color:'var(--good)',label:'Mulighet',badgeClass:'b-green'},
+    positive: {color:'#5b99c2',label:'Går bra',badgeClass:'b-gray'},
+  };
+  return suggestions.map((s, i) => {
+    const cfg = typeConfig[s.type] || typeConfig.improve;
+    const tagsHtml = (s.tags||[]).length > 0
+      ? `<div class="ai-acc-tags">${s.tags.map(t=>`<span class="ai-acc-tag" title="Klikk for å kopiere" onclick="navigator.clipboard?.writeText?.('${t.replace(/'/g,"\\'")}');this.style.color='var(--good)';setTimeout(()=>this.style.color='',1500)">${t}</span>`).join('')}</div>`
+      : '';
+    return `<div class="ai-accordion">
+      <div class="ai-acc-header" onclick="toggleAccordion(this)">
+        <div class="ai-acc-type" style="background:${cfg.color}"></div>
+        <div class="ai-acc-title">${s.title}</div>
+        <span class="badge ${cfg.badgeClass}" style="margin-right:10px">${cfg.label}</span>
+        <div class="ai-acc-arrow">▾</div>
+      </div>
+      <div class="ai-acc-body ${i===0?'open':''}">
+        <div class="ai-acc-desc">${s.description}</div>
+        ${s.action ? `<div class="ai-acc-action"><div class="ai-acc-action-label">Hva gjør du</div><div class="ai-acc-action-text">${s.action}</div></div>` : ''}
+        ${s.example ? `<div class="ai-acc-action" style="border-color:${cfg.color}"><div class="ai-acc-action-label" style="color:${cfg.color}">Konkret eksempel</div><div class="ai-acc-action-text">${s.example}</div></div>` : ''}
+        ${tagsHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleAccordion(header){
+  const body = header.nextElementSibling;
+  const arrow = header.querySelector('.ai-acc-arrow');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  if(arrow) arrow.classList.toggle('open', !isOpen);
 }
 
 function renderAnalysisMarkdown(text){
@@ -1774,13 +2050,12 @@ function renderAnalysisMarkdown(text){
     const lines = sec.split('\n');
     const title = lines[0].replace(/^#+\s*/,'').trim();
     const body = lines.slice(1).join('\n').trim();
-    const isStrategic = title.toLowerCase().includes('strategisk') || title.toLowerCase().includes('alternativ') || title.toLowerCase().includes('mangler');
+    const isStrategic = title.toLowerCase().includes('strategisk') || title.toLowerCase().includes('alternativ');
     const labelClass = isStrategic ? 'strategic' : 'improve';
-    const labelText = isStrategic ? (title.toLowerCase().includes('mangler') ? 'Mangler' : 'Strategiske alternativer') : 'Forbedringer';
     const items = body.split(/\n(?=\*\*|[-–])/).filter(s=>s.trim());
     const itemsHtml = items.map(item => {
       const hasBold = item.match(/^\*\*(.*?)\*\*/);
-      const itemClass = isStrategic ? 'strategic' : (item.toLowerCase().includes('pause') || item.toLowerCase().includes('kutt') || item.toLowerCase().includes('kritis') ? 'critical' : 'improve');
+      const itemClass = isStrategic ? 'strategic' : 'improve';
       if(hasBold){
         const titleText = hasBold[1];
         const rest = item.replace(/^\*\*(.*?)\*\*\s*[—-]?\s*/,'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
@@ -1788,7 +2063,7 @@ function renderAnalysisMarkdown(text){
       }
       return `<div class="analysis-item ${itemClass}"><div class="analysis-item-body">${item.replace(/^[-–]\s*/,'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
     }).join('');
-    return `<div class="analysis-section"><span class="analysis-label ${labelClass}">${i===0?title:labelText}</span>${itemsHtml}</div>`;
+    return `<div class="analysis-section"><span class="analysis-label ${labelClass}">${title}</span>${itemsHtml}</div>`;
   }).join('');
 }
 
@@ -1890,33 +2165,57 @@ async function generateReport(){
   const incAnalysis = document.getElementById('rpt-analysis').checked;
   const incBench = document.getElementById('rpt-bench').checked;
   const incDate = document.getElementById('rpt-date').checked;
+  const tone = selectedTone;
 
-  const data = D;
+  // Filter: only active campaigns with spend > 0
+  const activeCampaigns = D.campaigns.filter(c => c.status === 'ENABLED' && c.costMicros > 0);
+
+  // Noteworthy filter: top performers + underperformers
+  const avgCtr = activeCampaigns.reduce((s,c)=>s+c.ctr,0) / (activeCampaigns.length||1);
+  const avgConv = activeCampaigns.reduce((s,c)=>s+c.conversions,0) / (activeCampaigns.length||1);
+  const noteworthyCampaigns = activeCampaigns.filter(c => {
+    const isTopCtr = c.ctr > avgCtr * 1.3;
+    const isLowCtr = c.ctr < avgCtr * 0.7 && c.costMicros > 500000000;
+    const isTopConv = c.conversions > avgConv * 1.5;
+    const isLowConv = c.conversions === 0 && c.costMicros > 1000000000;
+    if(tone === 'wins') return isTopCtr || isTopConv;
+    if(tone === 'negative') return isLowCtr || isLowConv;
+    return isTopCtr || isLowCtr || isTopConv || isLowConv || (tone === 'brutal');
+  });
+
+  const reportData = {
+    ...D,
+    campaigns: tone === 'brutal' ? activeCampaigns : (noteworthyCampaigns.length ? noteworthyCampaigns : activeCampaigns.slice(0,5))
+  };
+
+  const tonePrompts = {
+    negative: 'Fokuser KUN på problemer, svakheter og ting som ikke fungerer. Vær direkte om hva som må fikses.',
+    brutal:   'Vær brutalt ærlig. Nevn både hva som fungerer og hva som ikke fungerer. Ingen sukkerbelegging.',
+    positive: 'Fokuser på muligheter og fremgang. Nevn utfordringer men vinkle mot hva som kan bli bedre.',
+    wins:     'Fremhev KUN suksesshistorier og positive resultater. Inspirer og motiver.',
+  };
 
   let aiAnalysis = '';
   if(incAnalysis){
-    statusEl.textContent = 'Henter AI-analyse...';
+    statusEl.textContent = 'Claude analyserer med ' + {negative:'negativt fokus',brutal:'brutalt ærlig tone',positive:'positiv vinkling',wins:'kun wins'}[tone] + '...';
     const url = getWorker();
     if(url){
       try{
         const result = await wPost('/ai',{
-          system:'Du er Google Ads-strateg for Novooi, norsk premium møbelnettbutikk. Skriv et kortfattet eksekutivsammendrag (maks 120 ord) og 5 prioriterte anbefalinger. Bruk norsk. Vær direkte og konkret.',
-          messages:[{role:'user',content:`Kampanjedata siste ${period} dager:\n${JSON.stringify(data.campaigns.map(c=>({navn:c.name,klikk:c.clicks,ctr:(c.ctr*100).toFixed(2)+'%',forbruk:'kr '+(c.costMicros/1e6).toFixed(0),konv:c.conversions.toFixed(1)})))}` }]
+          system:`Du er Google Ads-strateg for Novooi, norsk premium møbelnettbutikk. ${tonePrompts[tone]} Skriv et kortfattet sammendrag (maks 120 ord) og 4-5 prioriterte punkter. Bruk norsk. Vær konkret.`,
+          messages:[{role:'user',content:`Kampanjedata siste ${period} dager:\n${JSON.stringify(reportData.campaigns.map(c=>({navn:c.name,klikk:c.clicks,ctr:(c.ctr*100).toFixed(2)+'%',forbruk:'kr '+(c.costMicros/1e6).toFixed(0),konv:c.conversions.toFixed(1)}))).slice(0,2000)}`}]
         });
         aiAnalysis = result.text;
-      }catch(e){ aiAnalysis = getDemoAiSummary(period); }
-    } else {
-      aiAnalysis = getDemoAiSummary(period);
+      }catch(e){ aiAnalysis = ''; }
     }
   }
 
   statusEl.textContent = 'Tegner PDF...';
   try {
-    await buildPDF(data, period, {incSummary,incCampaigns,incKeywords,incAds,incAnalysis,incBench,incDate}, aiAnalysis);
-    statusEl.className = 'status on ok';
+    await buildPDF(reportData, period, {incSummary,incCampaigns,incKeywords,incAds,incAnalysis,incBench,incDate}, aiAnalysis, tone);
     statusEl.className = 'status on ok';
     statusEl.textContent = 'Rapport lastet ned';
-    logAction('PDF-rapport generert — '+period+' dager');
+    logAction('PDF-rapport generert — '+period+' dager — tone: '+tone);
   } catch(e) {
     statusEl.className = 'status on err';
     statusEl.textContent = 'Feil: '+e.message;
@@ -1928,7 +2227,7 @@ async function generateReport(){
 
 
 
-async function buildPDF(data, period, opts, aiText){
+async function buildPDF(data, period, opts, aiText, tone='brutal'){
   if(typeof window.jspdf === 'undefined'){
     await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
   }
@@ -2067,10 +2366,10 @@ async function buildPDF(data, period, opts, aiText){
   doc.text('Google Ads Performance Report', W/2, 122, {align:'center'});
   setFont(10,'normal'); setColor([160,140,100]);
   doc.text('Siste '+period+' dager', W/2, 133, {align:'center'});
-  if(false){
-    setFont(8,'normal'); setColor(ORANGE_C);
-    doc.text('— DEMO DATA —', W/2, 143, {align:'center'});
-  }
+  const toneLabels = {negative:'Negativt fokus',brutal:'Brutalt ærlig',positive:'Positiv vinkling',wins:'Kun wins'};
+  const toneColors = {negative:RED_C,brutal:ORANGE_C,positive:GREEN_C,wins:[80,140,100]};
+  setFont(8,'normal'); setColor(toneColors[tone]||ORANGE_C);
+  doc.text('— ' + (toneLabels[tone]||'Balansert') + ' —', W/2, 143, {align:'center'});
   setDraw(ACCENT); doc.setLineWidth(0.4);
   doc.line(14,155,W-14,155);
   setFont(8,'normal'); setColor(BROWN);
