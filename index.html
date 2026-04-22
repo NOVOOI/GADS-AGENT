@@ -1875,7 +1875,7 @@ function showMain(type,msg){
 
 // ----- PDF REPORT -----
 async function generateReport(){
-  const btn = useDemo ? document.getElementById('rpt-demo-btn') : document.getElementById('rpt-live-btn');
+  const btn = document.getElementById('rpt-live-btn');
   const statusEl = document.getElementById('rpt-status');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Genererer PDF...';
@@ -1897,7 +1897,7 @@ async function generateReport(){
   if(incAnalysis){
     statusEl.textContent = 'Henter AI-analyse...';
     const url = getWorker();
-    if(url && !useDemo){
+    if(url){
       try{
         const result = await wPost('/ai',{
           system:'Du er Google Ads-strateg for Novooi, norsk premium møbelnettbutikk. Skriv et kortfattet eksekutivsammendrag (maks 120 ord) og 5 prioriterte anbefalinger. Bruk norsk. Vær direkte og konkret.',
@@ -1912,17 +1912,18 @@ async function generateReport(){
 
   statusEl.textContent = 'Tegner PDF...';
   try {
-    await buildPDF(data, period, {incSummary,incCampaigns,incKeywords,incAds,incAnalysis,incBench,incDate}, aiAnalysis, useDemo);
+    await buildPDF(data, period, {incSummary,incCampaigns,incKeywords,incAds,incAnalysis,incBench,incDate}, aiAnalysis);
+    statusEl.className = 'status on ok';
     statusEl.className = 'status on ok';
     statusEl.textContent = 'Rapport lastet ned';
-    logAction('PDF-rapport generert'+(useDemo?' (demo)':'')+' — '+period+' dager');
+    logAction('PDF-rapport generert — '+period+' dager');
   } catch(e) {
     statusEl.className = 'status on err';
     statusEl.textContent = 'Feil: '+e.message;
     console.error(e);
   }
   btn.disabled = false;
-  btn.textContent = useDemo ? 'Last ned testrapport (demo-data)' : 'Generer rapport (live data)';
+  btn.textContent = 'Generer rapport (live)';
 }
 
 
