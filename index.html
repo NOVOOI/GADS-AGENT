@@ -166,6 +166,34 @@ td{padding:9px 12px}
 .spinner{display:inline-block;width:11px;height:11px;border:2px solid var(--taupe);border-top-color:var(--brown);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* Health score */
+.health-card{background:var(--cream);border:1px solid var(--border);padding:14px;text-align:center}
+.health-score{font-size:36px;font-weight:300;line-height:1;margin-bottom:4px}
+.health-label{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--taupe)}
+.health-name{font-size:13px;margin-bottom:8px;color:var(--ink)}
+.score-green{color:var(--green)}.score-orange{color:var(--orange)}.score-red{color:var(--red)}
+
+/* Funnel */
+.funnel-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.funnel-bar-wrap{flex:1;height:24px;background:var(--sand);position:relative}
+.funnel-bar{height:100%;background:var(--accent);transition:width .5s}
+.funnel-label{font-family:'Courier Prime',monospace;font-size:11px;color:var(--ink);white-space:nowrap;min-width:80px}
+.funnel-val{font-family:'Courier Prime',monospace;font-size:11px;color:var(--taupe);white-space:nowrap;min-width:60px;text-align:right}
+.funnel-campaign{font-size:13px;font-weight:500;margin-bottom:8px;color:var(--dark)}
+
+/* Checklist */
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.check-item:last-child{border-bottom:none}
+.check-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.check-text{font-size:14px;line-height:1.5}
+.check-ok{color:var(--green)}.check-warn{color:var(--orange)}.check-bad{color:var(--red)}
+
+/* ROAS */
+.roas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+.roas-card{background:var(--cream);border:1px solid var(--border);padding:12px;text-align:center}
+.roas-val{font-size:20px;font-weight:300;color:var(--dark)}
+.roas-sub{font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--taupe)}
+
 /* Analysis results */
 .analysis-section{margin-bottom:28px}
 .analysis-section:last-child{margin-bottom:0}
@@ -266,6 +294,7 @@ td{padding:9px 12px}
   <button class="nav-btn active" onclick="showPage('oversikt',this)">Oversikt</button>
   <button class="nav-btn" onclick="showPage('kampanjer',this)">Kampanjer</button>
   <button class="nav-btn" onclick="showPage('sokeord',this)">Søkeord</button>
+  <button class="nav-btn" onclick="showPage('sokettermer',this)">Søketermer</button>
   <button class="nav-btn" onclick="showPage('annonser',this)">Annonser</button>
   <button class="nav-btn" onclick="showPage('negativeord',this)">Negative ord</button>
   <button class="nav-btn" onclick="showPage('sammenlign',this)">Sammenlign</button>
@@ -278,15 +307,35 @@ td{padding:9px 12px}
 
   <!-- OVERSIKT -->
   <div class="section-page active" id="page-oversikt">
+    <div id="checklist-block" class="block" style="background:var(--sand);margin-bottom:20px"></div>
     <div id="stats-grid" class="stats-grid"></div>
-    <div class="block" id="budget-block">
-      <div class="block-title">Budsjett
-        <div style="display:flex;gap:8px;align-items:center">
-          <span style="font-family:'Courier Prime',monospace;font-size:10px;color:var(--taupe)">Månedlig budsjett (kr):</span>
-          <input type="number" id="budget-input" value="40000" style="width:90px;padding:4px 8px;font-family:'Courier Prime',monospace;font-size:11px;border:1px solid var(--border);background:var(--cream);color:var(--ink);outline:none" oninput="renderBudget()">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+      <div class="block" id="budget-block">
+        <div class="block-title">Budsjett
+          <div style="display:flex;gap:8px;align-items:center">
+            <span style="font-family:'Courier Prime',monospace;font-size:10px;color:var(--taupe)">Månedlig (kr):</span>
+            <input type="number" id="budget-input" value="40000" style="width:80px;padding:4px 8px;font-family:'Courier Prime',monospace;font-size:11px;border:1px solid var(--border);background:var(--cream);color:var(--ink);outline:none" oninput="renderBudget()">
+          </div>
         </div>
+        <div id="budget-content"></div>
       </div>
-      <div id="budget-content"></div>
+      <div class="block" id="roas-block">
+        <div class="block-title">ROAS-kalkulator
+          <div style="display:flex;gap:8px;align-items:center">
+            <span style="font-family:'Courier Prime',monospace;font-size:10px;color:var(--taupe)">Gj.sn. ordreverdi (kr):</span>
+            <input type="number" id="roas-input" value="3500" style="width:80px;padding:4px 8px;font-family:'Courier Prime',monospace;font-size:11px;border:1px solid var(--border);background:var(--cream);color:var(--ink);outline:none" oninput="renderRoas()">
+          </div>
+        </div>
+        <div id="roas-content"></div>
+      </div>
+    </div>
+    <div class="block">
+      <div class="block-title">Kampanje-helse <span style="font-family:'Courier Prime',monospace;font-size:9px;color:var(--taupe);font-weight:400;margin-left:8px">Score basert på CTR, QS og konverteringsrate</span></div>
+      <div id="health-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px"></div>
+    </div>
+    <div class="block">
+      <div class="block-title">Konverteringstrakt — topp kampanjer</div>
+      <div id="funnel-content"></div>
     </div>
     <div class="block">
       <div class="block-title">Topp kampanjer — ytelse</div>
@@ -370,6 +419,22 @@ td{padding:9px 12px}
       </div>
       <div id="ads-analysis-status" class="status"></div>
       <div id="ads-analysis-result"></div>
+    </div>
+  </div>
+
+  <!-- SØKETERMER -->
+  <div class="section-page" id="page-sokettermer">
+    <div class="block">
+      <div class="block-title">Faktiske søketermer
+        <button class="btn btn-dark btn-sm" id="st-fetch-btn" onclick="fetchSearchTerms()">Hent søketermer</button>
+      </div>
+      <p style="font-size:15px;margin-bottom:16px;color:var(--brown)">Søketermer brukere faktisk søkte på som trigget annonsene dine — ikke søkeordene du byder på, men de faktiske søkene. Gull for å finne negative søkeord og nye muligheter.</p>
+      <div id="st-status" class="status"></div>
+      <div class="table-controls" id="st-controls" style="display:none">
+        <input type="text" class="table-search" placeholder="Søk i termer..." oninput="filterTable('st-tbl',this.value)">
+        <button class="btn btn-outline btn-sm" onclick="exportCSV('searchterms')">Eksporter CSV</button>
+      </div>
+      <div class="table-wrap"><table id="st-tbl"></table></div>
     </div>
   </div>
 
@@ -467,7 +532,7 @@ td{padding:9px 12px}
     <div class="block">
       <div class="block-title">Daglig varsling
       </div>
-      <p style="font-size:15px;line-height:1.7;margin-bottom:20px;color:var(--brown)">Kjør den daglige analysen manuelt for å teste at e-postvarslingen fungerer. Krever at Worker URL er satt og at <code style="font-family:'Courier Prime',monospace;font-size:12px;background:var(--sand);padding:1px 6px">RESEND_API_KEY</code> og <code style="font-family:'Courier Prime',monospace;font-size:12px;background:var(--sand);padding:1px 6px">ALERT_EMAIL</code> er satt som secrets i Cloudflare.</p>
+      <p style="font-size:15px;line-height:1.7;margin-bottom:20px;color:var(--brown)">Kjør den daglige analysen manuelt for å teste Discord-varslingen. Krever at Worker URL er satt og at <code style="font-family:'Courier Prime',monospace;font-size:12px;background:var(--sand);padding:1px 6px">DISCORD_WEBHOOK_URL</code> er satt som secret i Cloudflare.</p>
       <div class="btn-row">
         <button class="btn btn-dark" id="daily-test-btn" onclick="testDailyAlert()">Kjør daglig analyse nå</button>
         <button class="btn btn-outline" id="demo-alert-btn" onclick="testDemoAlert()">Send test-varsling (demo-data)</button>
@@ -722,6 +787,10 @@ async function fetchAll(){
 function renderAll(){
   renderStats();
   renderBudget();
+  renderRoas();
+  renderChecklist();
+  renderHealthScores();
+  renderFunnel();
   renderTopCampaigns();
   renderCampaignsTable();
   renderKeywordsTable();
@@ -729,6 +798,7 @@ function renderAll(){
   renderAdsTable();
   renderNegKw();
   renderQsGuide();
+  requestNotificationPermission();
 }
 
 // ----- HELPERS -----
@@ -799,6 +869,134 @@ function renderStats(){
       <span class="stat-label">Konverteringer</span>
       <div class="stat-bench bench-ok">CPA: kr ${cpa.toFixed(0)} (bransje: kr ${BENCHMARKS.cpa})</div>
     </div>`;
+}
+
+
+// ----- ROAS -----
+function renderRoas(){
+  const el=document.getElementById('roas-content');
+  if(!el) return;
+  const orderVal=parseFloat(document.getElementById('roas-input').value)||3500;
+  const totalSpend=D.campaigns.reduce((s,c)=>s+c.costMicros,0)/1e6;
+  const totalConv=D.campaigns.reduce((s,c)=>s+c.conversions,0);
+  const revenue=totalConv*orderVal;
+  const roas=totalSpend>0?revenue/totalSpend:0;
+  const roasColor=roas>=4?'var(--green)':roas>=2?'var(--orange)':'var(--red)';
+  el.innerHTML=`<div class="roas-grid">
+    <div class="roas-card"><div class="roas-val" style="color:${roasColor}">${roas.toFixed(2)}x</div><div class="roas-sub">ROAS</div></div>
+    <div class="roas-card"><div class="roas-val">kr ${Math.round(revenue).toLocaleString('nb-NO')}</div><div class="roas-sub">Est. omsetning</div></div>
+    <div class="roas-card"><div class="roas-val" style="color:${revenue>totalSpend?'var(--green)':'var(--red)'}">kr ${Math.round(revenue-totalSpend).toLocaleString('nb-NO')}</div><div class="roas-sub">Est. fortjeneste</div></div>
+  </div><p style="font-family:'Courier Prime',monospace;font-size:10px;color:var(--taupe);margin-top:8px">${totalConv.toFixed(1)} konv. × kr ${orderVal.toLocaleString('nb-NO')} ordreverdi</p>`;
+}
+
+// ----- CHECKLIST -----
+function renderChecklist(){
+  const el=document.getElementById('checklist-block');
+  if(!el||!D.campaigns.length) return;
+  const items=[];
+  const lowQs=D.keywords.filter(k=>k.qs&&k.qs<=4);
+  const highCpa=D.campaigns.filter(c=>{const cpa=c.costMicros/1e6/(c.conversions||1);return c.conversions>0&&cpa>1500;});
+  const zeroConv=D.campaigns.filter(c=>c.status==='ENABLED'&&c.costMicros>2000000000&&c.conversions===0);
+  const totalSpend=D.campaigns.reduce((s,c)=>s+c.costMicros,0)/1e6;
+  const budget=parseFloat(document.getElementById('budget-input')?.value)||40000;
+  if(lowQs.length>0) items.push({t:'bad',txt:`${lowQs.length} søkeord med QS ≤ 4: ${lowQs.map(k=>'"'+k.keyword+'"').slice(0,3).join(', ')} — vurder pause eller omstrukturering`});
+  if(zeroConv.length>0) items.push({t:'bad',txt:`${zeroConv.map(c=>'"'+c.name+'"').join(', ')} bruker budsjett uten konverteringer`});
+  if(highCpa.length>0) items.push({t:'warn',txt:`${highCpa.map(c=>'"'+c.name+'"').join(', ')} har CPA over kr 1 500`});
+  if(totalSpend/budget>0.85) items.push({t:'warn',txt:`${((totalSpend/budget)*100).toFixed(0)}% av månedlig budsjett brukt — vurder justering`});
+  const topCtr=D.campaigns.filter(c=>c.ctr>0.05&&c.status==='ENABLED');
+  if(topCtr.length>0) items.push({t:'ok',txt:`${topCtr.map(c=>'"'+c.name+'"').join(', ')} leverer over 5% CTR — vurder å skalere opp`});
+  if(items.length===0) items.push({t:'ok',txt:'Ingen kritiske varsler — alt ser bra ut'});
+  const dotCol={bad:'var(--red)',warn:'var(--orange)',ok:'var(--green)'};
+  const txtCol={bad:'zone-red',warn:'zone-orange',ok:'zone-green'};
+  el.innerHTML='<div class="block-title" style="margin-bottom:12px">Daglig sjekkliste</div>'+
+    items.map(i=>`<div class="check-item"><div class="check-dot" style="background:${dotCol[i.t]}"></div><div class="check-text ${txtCol[i.t]}">${i.txt}</div></div>`).join('');
+}
+
+// ----- HEALTH SCORES -----
+function renderHealthScores(){
+  const el=document.getElementById('health-grid');
+  if(!el||!D.campaigns.length) return;
+  const active=D.campaigns.filter(c=>c.status==='ENABLED');
+  el.innerHTML=active.slice(0,6).map(c=>{
+    let score=5;
+    if(c.ctr>0.04) score+=2; else if(c.ctr<0.015) score-=2;
+    if(c.conversionRate>0.02) score+=2; else if(c.conversionRate<0.008&&c.conversions>0) score-=1;
+    const cpa=c.costMicros/1e6/(c.conversions||1);
+    if(c.conversions>0&&cpa<800) score+=1; else if(c.conversions>0&&cpa>1500) score-=1;
+    score=Math.max(1,Math.min(10,score));
+    const cls=score>=7?'score-green':score>=5?'score-orange':'score-red';
+    const name=c.name.length>22?c.name.slice(0,21)+'…':c.name;
+    return `<div class="health-card"><div class="health-name">${name}</div><div class="health-score ${cls}">${score}</div><div class="health-label">av 10</div></div>`;
+  }).join('');
+  // Browser notification if critical
+  const critical=active.filter(c=>{let s=5;if(c.ctr<0.015)s-=2;if(c.conversionRate<0.008&&c.conversions>0)s-=1;return Math.max(1,Math.min(10,s))<4;});
+  if(critical.length>0&&!isDemo) sendBrowserNotification('Novooi Ads', critical.length+' kampanjer har lav helse-score');
+}
+
+// ----- FUNNEL -----
+function renderFunnel(){
+  const el=document.getElementById('funnel-content');
+  if(!el||!D.campaigns.length) return;
+  const top=[...D.campaigns].filter(c=>c.status==='ENABLED').sort((a,b)=>b.costMicros-a.costMicros).slice(0,3);
+  el.innerHTML=top.map(c=>{
+    const stages=[
+      {label:'Visninger',val:fmt(c.impressions),pct:100},
+      {label:'Klikk',val:fmt(c.clicks),pct:c.impressions?Math.min(100,c.clicks/c.impressions*100*20):0},
+      {label:'Konv.',val:c.conversions.toFixed(1),pct:c.clicks?Math.min(100,c.conversions/c.clicks*100*100):0},
+    ];
+    return `<div style="margin-bottom:20px"><div class="funnel-campaign">${c.name}</div>${stages.map(s=>`<div class="funnel-row"><div class="funnel-label">${s.label}</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${s.pct}%"></div></div><div class="funnel-val">${s.val}</div></div>`).join('')}</div>`;
+  }).join('');
+}
+
+// ----- SØKETERMER -----
+async function fetchSearchTerms(){
+  const url=getWorker();
+  const btn=document.getElementById('st-fetch-btn');
+  const statusEl=document.getElementById('st-status');
+  if(!url){statusEl.className='status on err';statusEl.textContent='Worker URL mangler';return;}
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Henter...';
+  statusEl.className='status on';statusEl.textContent='Henter søketermer...';
+  try{
+    const period=document.getElementById('period-sel').value;
+    const r=await wPost('/ads/query',{query:`SELECT search_term_view.search_term,search_term_view.status,campaign.name,metrics.impressions,metrics.clicks,metrics.cost_micros,metrics.conversions,metrics.ctr FROM search_term_view WHERE segments.date DURING ${period} ORDER BY metrics.cost_micros DESC LIMIT 200`});
+    const terms=(r.results||[]).map(row=>({
+      term:row.searchTermView?.searchTerm||'—',
+      status:row.searchTermView?.status||'—',
+      campaign:row.campaign?.name||'—',
+      impressions:Number(row.metrics?.impressions||0),
+      clicks:Number(row.metrics?.clicks||0),
+      ctr:Number(row.metrics?.ctr||0),
+      costMicros:Number(row.metrics?.costMicros||0),
+      conversions:Number(row.metrics?.conversions||0)
+    }));
+    D.searchterms=terms;
+    const cols=[
+      {key:'term',label:'Søketerm',render:r=>`<span style="font-weight:500">${r.term}</span>`},
+      {key:'status',label:'Status',render:r=>`<span class="badge ${r.status==='ADDED'?'b-green':r.status==='EXCLUDED'?'b-red':'b-gray'}">${r.status==='ADDED'?'Lagt til':r.status==='EXCLUDED'?'Ekskludert':'Ingen'}</span>`},
+      {key:'campaign',label:'Kampanje',render:r=>`<span class="mono" style="font-size:11px;color:var(--brown)">${r.campaign}</span>`},
+      {key:'impressions',label:'Visninger',render:r=>`<span class="mono">${fmt(r.impressions)}</span>`},
+      {key:'clicks',label:'Klikk',render:r=>`<span class="mono">${fmt(r.clicks)}</span>`},
+      {key:'ctr',label:'CTR',render:r=>`<span class="mono ${ctrClass(r.ctr,'SEARCH')}">${pct(r.ctr)}</span>`},
+      {key:'costMicros',label:'Forbruk',render:r=>`<span class="mono">${kr(r.costMicros)}</span>`},
+      {key:'conversions',label:'Konv.',render:r=>`<span class="mono">${r.conversions.toFixed(1)}</span>`},
+    ];
+    buildSortableTable('st-tbl','searchterms',terms,cols);
+    document.getElementById('st-controls').style.display='flex';
+    statusEl.className='status on ok';statusEl.textContent=terms.length+' søketermer hentet';
+    logAction('Søketermer hentet: '+terms.length);
+  }catch(e){
+    statusEl.className='status on err';statusEl.textContent='Feil: '+e.message;
+  }finally{
+    btn.disabled=false;btn.textContent='Hent søketermer';
+  }
+}
+
+// ----- NOTIFICATIONS -----
+function requestNotificationPermission(){
+  if('Notification' in window&&Notification.permission==='default') Notification.requestPermission();
+}
+function sendBrowserNotification(title,body){
+  if('Notification' in window&&Notification.permission==='granted') new Notification(title,{body,icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" fill="%232c2416"/><rect x="5" y="18" width="5" height="9" fill="%23c4b49a"/></svg>'});
 }
 
 // ----- BUDGET -----
@@ -965,6 +1163,7 @@ function exportCSV(type){
     keywords:D.keywords.map(r=>({Søkeord:r.keyword,Match:r.matchType,Kampanje:r.campaign,Visninger:r.impressions,Klikk:r.clicks,CTR:(r.ctr*100).toFixed(2)+'%',Forbruk_kr:(r.costMicros/1e6).toFixed(2),Konverteringer:r.conversions.toFixed(1),QS:r.qs})),
     adgroups:D.adGroups.map(r=>({Annonsegruppe:r.name,Kampanje:r.campaign,Status:r.status,Visninger:r.impressions,Klikk:r.clicks,CTR:(r.ctr*100).toFixed(2)+'%',Forbruk_kr:(r.costMicros/1e6).toFixed(2)})),
     ads:D.ads.map(r=>({Annonse:r.headline,Kampanje:r.campaign,Status:r.status,Visninger:r.impressions,Klikk:r.clicks,CTR:(r.ctr*100).toFixed(2)+'%',Konverteringer:r.conversions.toFixed(1)})),
+    searchterms:(D.searchterms||[]).map(r=>({Søketerm:r.term,Status:r.status,Kampanje:r.campaign,Visninger:r.impressions,Klikk:r.clicks,CTR:(r.ctr*100).toFixed(2)+'%',Forbruk_kr:(r.costMicros/1e6).toFixed(2),Konverteringer:r.conversions.toFixed(1)})),
   };
   const rows=maps[type];
   if(!rows||!rows.length){showMain('err','Ingen data å eksportere');return;}
