@@ -576,18 +576,6 @@ td{padding:9px 14px;color:var(--ink)}
           <div id="struct-propose-result" style="margin-top:16px"></div>
         </div>
       </div>
-
-      <div class="block" id="camp-blueprint-block">
-        <div class="block-head">
-          <div class="block-title">Kampanjeforslag fra Claude</div>
-          <button class="btn btn-accent btn-sm" id="blueprint-btn" onclick="generateCampaignBlueprint()"><span>Generer komplett forslag</span></button>
-        </div>
-        <div class="block-body">
-          <p style="font-size:13px;color:var(--ink2);margin-bottom:16px">Claude analyserer eksisterende kampanjer og genererer et komplett strukturforslag — kampanjetyper, annonsegrupper, produkter, søkeord og annonsebeskrivelser tilpasset Novooi sitt sortiment.</p>
-          <div id="blueprint-status" class="status"></div>
-          <div id="blueprint-content"></div>
-        </div>
-      </div>
     </div>
 
     <!-- SØKEORD -->
@@ -988,11 +976,21 @@ Lag en komplett, optimalisert kampanjestruktur for Novooi basert på dette budsj
 
     let parsed;
     try {
-      const clean = result.text.replace(/```json|```/g,'').trim();
-      parsed = JSON.parse(clean);
+      // Try multiple parsing strategies
+      let raw = result.text || '';
+      // Strip markdown code blocks
+      raw = raw.replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```\s*$/,'').trim();
+      // Find first { and last }
+      const firstBrace = raw.indexOf('{');
+      const lastBrace  = raw.lastIndexOf('}');
+      if(firstBrace !== -1 && lastBrace !== -1){
+        raw = raw.slice(firstBrace, lastBrace + 1);
+      }
+      parsed = JSON.parse(raw);
     } catch(e) {
+      console.error('Parse error:', e, result.text?.slice(0,300));
       statusEl.className = 'status on err';
-      statusEl.textContent = 'Klarte ikke parse svaret — prøv igjen';
+      statusEl.textContent = 'Klarte ikke lese svaret — prøv igjen. Feil: ' + e.message;
       btn.disabled = false; btn.textContent = 'Generer forslag';
       return;
     }
@@ -2244,8 +2242,12 @@ Inkluder ALLTID minst ett 'positive'-forslag. Skriv på norsk.`;
 
     let parsed;
     try {
-      const clean = result.text.replace(/```json|```/g,'').trim();
-      parsed = JSON.parse(clean);
+      let raw = result.text || '';
+      raw = raw.replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```\s*$/,'').trim();
+      const firstBrace = raw.indexOf('{');
+      const lastBrace  = raw.lastIndexOf('}');
+      if(firstBrace !== -1 && lastBrace !== -1) raw = raw.slice(firstBrace, lastBrace + 1);
+      parsed = JSON.parse(raw);
     } catch(e) {
       resultEl.innerHTML = renderAnalysisMarkdown(result.text);
       statusEl.className = 'status on ok';
